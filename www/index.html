@@ -154,16 +154,21 @@ function updateClock(){const now=new Date();const el=$('liveClock');if(el)el.tex
 function time(d){return d?new Date(d).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit',hour12:false}):'—'}
 function fmtHours(mins){mins=Math.max(0,Math.round(mins||0));return `${faNum(Math.floor(mins/60))}:${faNum(pad(mins%60))}`}
 function save(){localStorage.setItem(storeKey,JSON.stringify(records));}
-function getToday(){return records.find(r=>r.date===localDate() && (r.type==='attendance'||!r.type))}
+function isAttendance(r){return r && (r.type==='attendance'||!r.type) && (r.in||r.out)}
+function todayAttendance(){return records.filter(r=>r.date===localDate()&&isAttendance(r)).sort((a,b)=>String(b.in||b.out||'').localeCompare(String(a.in||a.out||'')))}
+function getToday(){return todayAttendance()[0]||null}
 function duration(r){return r?.in && r?.out ? Math.max(0,Math.round((new Date(r.out)-new Date(r.in))/60000)) : 0}
+function localInputValue(iso){if(!iso)return '';const d=new Date(iso);if(Number.isNaN(d.getTime()))return '';return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
+function inputToISO(value){if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toISOString()}
+function safeAttr(s){return escapeHtml(s||'')}
 function extras(date,kind){return records.filter(r=>r.date===date && r.type===kind).reduce((s,r)=>s+(Number(r.duration)||0)*60,0)}
 function render(){
  updateClock();
- const t=getToday(); $('todayIn').textContent=time(t?.in); $('todayOut').textContent=time(t?.out);
- const mins=duration(t); $('todayHours').textContent=fmtHours(mins);
+ const todayRows=todayAttendance(); const t=todayRows[0]; $('todayIn').textContent=todayRows.length?time(todayRows[todayRows.length-1].in):'—'; $('todayOut').textContent=t?time(t.out):'—';
+ const mins=todayRows.reduce((sum,r)=>sum+duration(r),0); $('todayHours').textContent=fmtHours(mins);
  const required=(Number($('requiredHours').value)||8)*60;
  $('todayOvertime').textContent=fmtHours(Math.max(0,mins-required)+extras(localDate(),'overtime'));
- $('status').textContent=!t?'وضعیت امروز: هنوز ورود ثبت نشده':t.in&&!t.out?'وضعیت امروز: در حال کار':`وضعیت امروز: خروج ثبت شده`;
+ $('status').textContent=!t?'وضعیت امروز: هنوز ورود ثبت نشده':t.in&&!t.out?`وضعیت امروز: در حال کار (ورود باز شماره ${faNum(todayRows.length)})`:`وضعیت امروز: ${faNum(todayRows.length)} نوبت ثبت شده`;
  const month=$('month').value||localMonth();
  const monthRecords=records.filter(r=>r.date?.startsWith(month));
  const worked=monthRecords.reduce((s,r)=>s+duration(r),0);
@@ -174,16 +179,25 @@ function render(){
  const list=monthRecords.slice().sort((a,b)=>b.date.localeCompare(a.date));
  $('entries').innerHTML=list.length?list.map(r=>{
   const labels={leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
+  const rid=String(r.id);
   return `<div class="entry"><div class="row"><strong>${displayDate(r.date||'')}</strong><span class="pill">${labels[r.type]||'حضور و غیاب'}</span></div>
-  <div class="muted" style="margin-top:6px">ورود: ${time(r.in)} | خروج: ${time(r.out)} | کارکرد: ${fmtHours(duration(r))}${r.duration?` | مدت ثبت: ${faNum(r.duration)} ساعت`:''}</div>
+  <div class="muted" style="margin:6px 0">کارکرد این نوبت: ${fmtHours(duration(r))}${r.duration?` | مدت ثبت: ${faNum(r.duration)} ساعت`:''}</div>
+  ${isAttendance(r)?`<div class="grid" style="margin-top:8px">
+    <div><label>تاریخ</label><input type="date" id="editDate-${safeAttr(rid)}" value="${safeAttr(r.date||'')}"></div>
+    <div><label>محل کار / مکان</label><input type="text" id="editPlace-${safeAttr(rid)}" value="${safeAttr(r.workplace||'')}" placeholder="مثلاً کارخانه، شعبه ۲"></div>
+    <div><label>ساعت ورود</label><input type="datetime-local" id="editIn-${safeAttr(rid)}" value="${safeAttr(localInputValue(r.in))}"></div>
+    <div><label>ساعت خروج</label><input type="datetime-local" id="editOut-${safeAttr(rid)}" value="${safeAttr(localInputValue(r.out))}"></div>
+  </div><button class="primary" onclick="editAttendance('${safeAttr(rid)}')" style="width:100%;margin-top:8px">ذخیره تغییرات این نوبت</button>`:''}
   ${r.notes?`<div style="margin-top:6px">${escapeHtml(r.notes)}</div>`:''}
-  <div style="text-align:left;margin-top:7px"><button class="danger" onclick="deleteRecord('${r.id}')" style="padding:6px 10px;font-size:12px">حذف</button></div></div>`;
+  <div style="text-align:left;margin-top:7px"><button class="danger" onclick="deleteRecord('${safeAttr(rid)}')" style="padding:6px 10px;font-size:12px">حذف</button></div></div>`;
  }).join(''):'<p class="note">برای این ماه هنوز موردی ثبت نشده است.</p>';
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function ensureRecord(date){let r=records.find(x=>x.date===date && (x.type==='attendance'||!x.type));if(!r){r={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type:'attendance'};records.push(r)}else if(!r.type)r.type='attendance';return r}
-$('inBtn').onclick=()=>{let r=ensureRecord(localDate());if(r.in){alert('ورود امروز قبلاً ثبت شده است.');return}r.in=new Date().toISOString();save();render()};
-$('outBtn').onclick=()=>{let r=ensureRecord(localDate());if(!r.in){alert('ابتدا ساعت ورود را ثبت کنید.');return}if(r.out){alert('خروج امروز قبلاً ثبت شده است.');return}r.out=new Date().toISOString();save();render()};
+function newId(){return crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(16).slice(2)}
+function openAttendance(date){return records.filter(r=>r.date===date&&isAttendance(r)&&r.in&&!r.out).sort((a,b)=>String(b.in).localeCompare(String(a.in)))[0]||null}
+$('inBtn').onclick=()=>{const date=localDate();if(openAttendance(date)){alert('برای نوبت قبلی هنوز خروج ثبت نشده است. ابتدا خروج را ثبت کنید.');return}const now=new Date();records.push({id:newId(),date,type:'attendance',in:now.toISOString(),out:'',workplace:settings.workplaceName||''});save();render()};
+$('outBtn').onclick=()=>{const date=localDate();const r=openAttendance(date);if(!r){alert('ورود باز برای امروز پیدا نشد. ابتدا «ثبت ورود» را بزنید.');return}r.out=new Date().toISOString();save();render()};
+window.editAttendance=id=>{const r=records.find(x=>String(x.id)===String(id));if(!r)return;const date=$('editDate-'+id)?.value;const inValue=$('editIn-'+id)?.value||'';const outValue=$('editOut-'+id)?.value||'';const place=$('editPlace-'+id)?.value.trim()||'';if(!date){alert('تاریخ را وارد کنید.');return}const newIn=inputToISO(inValue),newOut=inputToISO(outValue);if(inValue&&!newIn){alert('ساعت ورود معتبر نیست.');return}if(outValue&&!newOut){alert('ساعت خروج معتبر نیست.');return}if(newIn&&newOut&&new Date(newOut)<new Date(newIn)){alert('ساعت خروج نمی‌تواند قبل از ساعت ورود باشد.');return}r.date=date;r.in=newIn;r.out=newOut;r.workplace=place;save();render();alert('تغییرات ذخیره شد.')};
 $('saveExtra').onclick=()=>{const entered=$('recordDate').value.trim(),date=jalaliToISO(entered),type=$('kind').value,duration=Number($('duration').value)||0,notes=$('notes').value.trim();if(!date){alert('تاریخ شمسی را به شکل ۱۴۰۵/۰۸/۰۴ وارد کنید.');return}if(['leave','overtime'].includes(type)&&duration<=0){alert('مدت را به ساعت وارد کنید.');return}records.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type,duration,notes});save();$('duration').value='';$('notes').value='';$('recordDate').value=jalaliText(new Date());render()};
 $('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
 $('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));updateClock()};
@@ -191,9 +205,9 @@ $('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').che
 $('month').value=localMonth();$('month').onchange=render;$('refresh').onclick=render;
 window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
 $('exportCsv').onclick=()=>{
- const month=$('month').value||localMonth(), rows=[['تاریخ','ورود','خروج','کارکرد دقیقه','نوع ثبت','مدت ساعت','توضیحات']];
+ const month=$('month').value||localMonth(), rows=[['تاریخ','ورود','خروج','کارکرد دقیقه','نوع ثبت','مدت ساعت','مکان کاری','توضیحات']];
  const labels={attendance:'حضور و غیاب',leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
- records.filter(r=>r.date?.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>rows.push([displayDate(r.date),r.in?new Date(r.in).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',r.out?new Date(r.out).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',duration(r),labels[r.type]||r.type,r.duration||'',r.notes||'']));
+ records.filter(r=>r.date?.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>rows.push([displayDate(r.date),r.in?new Date(r.in).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',r.out?new Date(r.out).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',duration(r),labels[r.type]||r.type,r.duration||'',r.workplace||'',r.notes||'']));
  const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`gozaresh-${month}.csv`;a.click();URL.revokeObjectURL(url);
 };
@@ -202,4 +216,4 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
 </script>
 <script src="biometric.bundle.js"></script>
 </body>
-  </html>
+</html>
