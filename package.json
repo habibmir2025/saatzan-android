@@ -1,0 +1,17 @@
+{
+  "name": "saatzan-android",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild www/biometric.js --bundle --format=iife --outfile=www/biometric.bundle.js"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@aparajita/capacitor-biometric-auth": "9.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "esbuild": "^0.25.0"
+  }
+}
