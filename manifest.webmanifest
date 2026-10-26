@@ -1,0 +1,10 @@
+{
+  "name": "ساعت‌زن من",
+  "short_name": "ساعت‌زن",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f3f6f3",
+  "theme_color": "#14532d",
+  "lang": "fa",
+  "dir": "rtl"
+}
