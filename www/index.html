@@ -1,1 +1,205 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14532d">
+<script>
+try {
+  const savedSettings = JSON.parse(localStorage.getItem('saatzan_settings_v1') || '{}');
+  if (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform() && savedSettings.biometricEnabled) {
+    document.documentElement.classList.add('biometric-required');
+  }
+} catch (_) {}
+</script>
+<link rel="manifest" href="manifest.webmanifest">
+<title>ساعت‌زن من</title>
+<style>
+:root{font-family:Tahoma,Arial,sans-serif;color:#17211b;background:#f3f6f3}
+*{box-sizing:border-box}body{margin:0}header{background:#14532d;color:white;padding:22px 18px 26px;border-radius:0 0 24px 24px}
+h1{font-size:22px;margin:0 0 8px} .sub{opacity:.85;font-size:13px}
+main{max-width:720px;margin:auto;padding:14px}
+.card{background:white;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 3px 14px #17351d0d}
+.clock{text-align:center;font-size:30px;font-weight:bold;margin:12px 0 4px;direction:ltr;font-variant-numeric:tabular-nums}.clock-info{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.workplace-badge{font-size:13px;background:#ffffff20;border:1px solid #ffffff35;border-radius:999px;padding:7px 10px;max-width:100%;overflow-wrap:anywhere}.biometric-lock{display:none;position:fixed;inset:0;z-index:9999;background:#f3f6f3;align-items:center;justify-content:center;padding:24px;text-align:center}.biometric-lock .lock-card{max-width:420px;width:100%;background:white;border-radius:20px;padding:28px;box-shadow:0 8px 30px #0002}.biometric-lock button{margin-top:12px;width:100%}.biometric-required #biometricLock{display:flex}
+.date{text-align:center;color:#647067;font-size:13px}
+.status{text-align:center;margin:10px auto 14px;color:#14532d;font-weight:bold}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button,.btn{border:0;border-radius:12px;padding:13px 10px;font:inherit;font-weight:bold;cursor:pointer}
+.primary{background:#166534;color:white}.secondary{background:#e5efe7;color:#14532d}.danger{background:#fee2e2;color:#991b1b}
+label{display:block;font-size:13px;margin:10px 0 6px;color:#3f4b42}
+input,select,textarea{width:100%;padding:12px;border:1px solid #d5ded7;border-radius:10px;font:inherit;background:#fff}
+textarea{min-height:75px;resize:vertical}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{background:#f0f7f1;border-radius:12px;padding:12px}
+.metric small{display:block;color:#5e6e61;margin-bottom:6px}.metric strong{font-size:20px}
+h2{font-size:17px;margin:0 0 10px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.entry{border-top:1px solid #edf0ed;padding:12px 0}
+.entry:first-child{border-top:0}.muted{font-size:12px;color:#66736a}
+.pill{display:inline-block;background:#e8f5e9;color:#166534;border-radius:30px;padding:4px 8px;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:8px 5px;border-bottom:1px solid #e8eee9;text-align:right}
+.tablewrap{overflow:auto}
+.note{font-size:12px;color:#647067;line-height:1.8}
+footer{text-align:center;color:#748078;font-size:11px;padding:18px}
+@media(min-width:600px){.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+</style>
+</head>
+<body>
+<header>
+<h1>ساعت‌زن من</h1>
+<div class="sub">ثبت حضور، ساعات کاری، اضافه‌کاری و مرخصی</div>
+<div class="clock-info"><div class="clock" id="liveClock">--:--:--</div>
+<script>
+(function () {
+  function paintClock() {
+    var clock = document.getElementById('liveClock');
+    if (!clock) return;
+    var now = new Date();
+    var two = function (n) { return String(n).padStart(2, '0'); };
+    var digits = function (s) { return String(s).replace(/[0-9]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[Number(d)]; }); };
+    clock.textContent = digits(two(now.getHours()) + ':' + two(now.getMinutes()) + ':' + two(now.getSeconds()));
+  }
+  paintClock();
+  window.setInterval(paintClock, 1000);
+})();
+</script><div class="workplace-badge" id="workplaceDisplay">📍 مکان کاری تنظیم نشده</div></div>
+<div class="date" id="todayDate"></div>
+</header>
+<div id="biometricLock" class="biometric-lock" role="dialog" aria-modal="true" aria-labelledby="biometricLockTitle">
+  <div class="lock-card">
+    <div style="font-size:42px">🔒</div>
+    <h2 id="biometricLockTitle">باز کردن ساعت‌زن من</h2>
+    <p id="biometricLockMessage" class="note">برای ورود، اثر انگشت یا قفل صفحه گوشی را تأیید کنید.</p>
+    <button class="primary" id="biometricRetry">تلاش دوباره</button>
+  </div>
+</div>
+<main>
+<section class="card">
+<div class="status" id="status">وضعیت امروز: هنوز ورود ثبت نشده</div>
+<div class="actions">
+<button class="primary" id="inBtn">ثبت ورود</button>
+<button class="secondary" id="outBtn">ثبت خروج</button>
+</div>
+<div class="grid" style="margin-top:14px">
+<div class="metric"><small>ساعت ورود امروز</small><strong id="todayIn">—</strong></div>
+<div class="metric"><small>ساعت خروج امروز</small><strong id="todayOut">—</strong></div>
+<div class="metric"><small>کارکرد امروز</small><strong id="todayHours">۰:۰۰</strong></div>
+<div class="metric"><small>اضافه‌کاری امروز</small><strong id="todayOvertime">۰:۰۰</strong></div>
+</div>
+</section>
 
+<div class="two">
+<section class="card">
+<h2>ثبت مرخصی یا اضافه‌کاری</h2>
+<label for="recordDate">تاریخ شمسی (سال/ماه/روز)</label><input type="text" id="recordDate" inputmode="numeric" placeholder="۱۴۰۵/۰۸/۰۴" autocomplete="off">
+<label for="kind">نوع ثبت</label>
+<select id="kind"><option value="leave">مرخصی ساعتی</option><option value="overtime">اضافه‌کاری دستی</option><option value="mission">مأموریت</option><option value="absence">غیبت</option></select>
+<label for="duration">مدت (ساعت)</label><input type="number" id="duration" min="0.25" max="24" step="0.25" placeholder="مثلاً ۱٫۵">
+<label for="notes">توضیحات</label><textarea id="notes" placeholder="توضیحات این روز..."></textarea>
+<button class="primary" id="saveExtra" style="width:100%;margin-top:12px">ذخیره ثبت</button>
+</section>
+<section class="card">
+<h2>تنظیمات کارکرد</h2>
+<label for="workplaceName">نام مکان کاری (کنار ساعت نمایش داده می‌شود)</label><input type="text" id="workplaceName" maxlength="80" placeholder="مثلاً کارخانه، سالن تعمیرات">
+<label for="requiredHours">ساعت کار موظفی روزانه</label><input type="number" id="requiredHours" min="1" max="24" step="0.5" value="8">
+<label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="biometricEnabled" style="width:20px;height:20px"> باز شدن برنامه با اثر انگشت / قفل گوشی</label>
+<p class="note">قفل اثر انگشت فقط در نسخه نصب‌شده اندروید و با ثبت اثر انگشت یا قفل صفحه در تنظیمات گوشی کار می‌کند.</p>
+<label for="month">گزارش ماهانه</label><input type="month" id="month">
+<div class="grid" style="margin-top:12px">
+<div class="metric"><small>مجموع کارکرد</small><strong id="monthHours">۰:۰۰</strong></div>
+<div class="metric"><small>مجموع اضافه‌کاری</small><strong id="monthOvertime">۰:۰۰</strong></div>
+<div class="metric"><small>مرخصی ساعتی</small><strong id="monthLeave">۰:۰۰</strong></div>
+<div class="metric"><small>روزهای ثبت‌شده</small><strong id="monthDays">۰</strong></div>
+</div>
+<button class="secondary" id="exportCsv" style="width:100%;margin-top:12px">خروجی اکسل (CSV)</button>
+<p class="note">فایل CSV با Excel باز می‌شود. داده‌ها فعلاً فقط در همین گوشی و مرورگر ذخیره می‌شوند.</p>
+</section>
+</div>
+
+<section class="card">
+<div class="row"><h2>سوابق ماه</h2><button class="secondary" id="refresh">به‌روزرسانی</button></div>
+<div id="entries"></div>
+</section>
+<footer>نسخه اولیه • اطلاعات روی همین دستگاه ذخیره می‌شود</footer>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const storeKey = 'saatzan_records_v1';
+const settingsKey = 'saatzan_settings_v1';
+let records = JSON.parse(localStorage.getItem(storeKey) || '[]');
+let settings = JSON.parse(localStorage.getItem(settingsKey) || '{"requiredHours":8}');
+settings = {requiredHours:8, workplaceName:'', biometricEnabled:false, ...settings};
+$('requiredHours').value = settings.requiredHours || 8;
+$('workplaceName').value = settings.workplaceName || '';
+$('biometricEnabled').checked = !!settings.biometricEnabled;
+const pad = n => String(n).padStart(2,'0');
+function localDate(d=new Date()){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function localMonth(d=new Date()){return `${d.getFullYear()}-${pad(d.getMonth()+1)}`}
+function faNum(s){return String(s).replace(/[0-9]/g, d=>'۰۱۲۳۴۵۶۷۸۹'[d])}
+function toLatinDigits(s){return String(s).replace(/[۰-۹٠-٩]/g,ch=>{const fa='۰۱۲۳۴۵۶۷۸۹',ar='٠١٢٣٤٥٦٧٨٩';const i=fa.indexOf(ch);return String(i>=0?i:ar.indexOf(ch))})}
+function jalaliParts(date=new Date()){
+ const parts=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',day:'numeric'}).formatToParts(date);
+ const get=t=>Number(parts.find(p=>p.type===t).value);return {y:get('year'),m:get('month'),d:get('day')};
+}
+function jalaliText(date=new Date()){const p=jalaliParts(date);return `${faNum(p.y)}/${faNum(pad(p.m))}/${faNum(pad(p.d))}`}
+function jalaliToISO(value){
+ const m=toLatinDigits(value).trim().match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})$/);
+ if(!m)return null;const jy=+m[1],jm=+m[2],jd=+m[3];if(jm<1||jm>12||jd<1||jd>31)return null;
+ const start=new Date(jy+621,2,1,12),end=new Date(jy+623,3,1,12);
+ for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){const p=jalaliParts(d);if(p.y===jy&&p.m===jm&&p.d===jd)return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+ return null;
+}
+function displayDate(iso){if(!iso)return '—';const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return faNum(iso);return jalaliText(new Date(+m[1],+m[2]-1,+m[3],12))}
+function updateClock(){const now=new Date();const el=$('liveClock');if(el)el.textContent=faNum(`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);const de=$('todayDate');if(de)de.textContent=now.toLocaleDateString('fa-IR-u-ca-persian',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const wp=$('workplaceDisplay');if(wp)wp.textContent=settings.workplaceName?`📍 ${settings.workplaceName}`:'📍 مکان کاری تنظیم نشده';}
+function time(d){return d?new Date(d).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit',hour12:false}):'—'}
+function fmtHours(mins){mins=Math.max(0,Math.round(mins||0));return `${faNum(Math.floor(mins/60))}:${faNum(pad(mins%60))}`}
+function save(){localStorage.setItem(storeKey,JSON.stringify(records));}
+function getToday(){return records.find(r=>r.date===localDate() && (r.type==='attendance'||!r.type))}
+function duration(r){return r?.in && r?.out ? Math.max(0,Math.round((new Date(r.out)-new Date(r.in))/60000)) : 0}
+function extras(date,kind){return records.filter(r=>r.date===date && r.type===kind).reduce((s,r)=>s+(Number(r.duration)||0)*60,0)}
+function render(){
+ updateClock();
+ const t=getToday(); $('todayIn').textContent=time(t?.in); $('todayOut').textContent=time(t?.out);
+ const mins=duration(t); $('todayHours').textContent=fmtHours(mins);
+ const required=(Number($('requiredHours').value)||8)*60;
+ $('todayOvertime').textContent=fmtHours(Math.max(0,mins-required)+extras(localDate(),'overtime'));
+ $('status').textContent=!t?'وضعیت امروز: هنوز ورود ثبت نشده':t.in&&!t.out?'وضعیت امروز: در حال کار':`وضعیت امروز: خروج ثبت شده`;
+ const month=$('month').value||localMonth();
+ const monthRecords=records.filter(r=>r.date?.startsWith(month));
+ const worked=monthRecords.reduce((s,r)=>s+duration(r),0);
+ const overtime=monthRecords.reduce((s,r)=>s+Math.max(0,duration(r)-required)+ (r.type==='overtime'?(Number(r.duration)||0)*60:0),0);
+ const leave=monthRecords.filter(r=>r.type==='leave').reduce((s,r)=>s+(Number(r.duration)||0)*60,0);
+ $('monthHours').textContent=fmtHours(worked); $('monthOvertime').textContent=fmtHours(overtime); $('monthLeave').textContent=fmtHours(leave);
+ $('monthDays').textContent=faNum(new Set(monthRecords.filter(r=>r.in||r.out).map(r=>r.date)).size);
+ const list=monthRecords.slice().sort((a,b)=>b.date.localeCompare(a.date));
+ $('entries').innerHTML=list.length?list.map(r=>{
+  const labels={leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
+  return `<div class="entry"><div class="row"><strong>${displayDate(r.date||'')}</strong><span class="pill">${labels[r.type]||'حضور و غیاب'}</span></div>
+  <div class="muted" style="margin-top:6px">ورود: ${time(r.in)} | خروج: ${time(r.out)} | کارکرد: ${fmtHours(duration(r))}${r.duration?` | مدت ثبت: ${faNum(r.duration)} ساعت`:''}</div>
+  ${r.notes?`<div style="margin-top:6px">${escapeHtml(r.notes)}</div>`:''}
+  <div style="text-align:left;margin-top:7px"><button class="danger" onclick="deleteRecord('${r.id}')" style="padding:6px 10px;font-size:12px">حذف</button></div></div>`;
+ }).join(''):'<p class="note">برای این ماه هنوز موردی ثبت نشده است.</p>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function ensureRecord(date){let r=records.find(x=>x.date===date && (x.type==='attendance'||!x.type));if(!r){r={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type:'attendance'};records.push(r)}else if(!r.type)r.type='attendance';return r}
+$('inBtn').onclick=()=>{let r=ensureRecord(localDate());if(r.in){alert('ورود امروز قبلاً ثبت شده است.');return}r.in=new Date().toISOString();save();render()};
+$('outBtn').onclick=()=>{let r=ensureRecord(localDate());if(!r.in){alert('ابتدا ساعت ورود را ثبت کنید.');return}if(r.out){alert('خروج امروز قبلاً ثبت شده است.');return}r.out=new Date().toISOString();save();render()};
+$('saveExtra').onclick=()=>{const entered=$('recordDate').value.trim(),date=jalaliToISO(entered),type=$('kind').value,duration=Number($('duration').value)||0,notes=$('notes').value.trim();if(!date){alert('تاریخ شمسی را به شکل ۱۴۰۵/۰۸/۰۴ وارد کنید.');return}if(['leave','overtime'].includes(type)&&duration<=0){alert('مدت را به ساعت وارد کنید.');return}records.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type,duration,notes});save();$('duration').value='';$('notes').value='';$('recordDate').value=jalaliText(new Date());render()};
+$('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
+$('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));updateClock()};
+$('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').checked;if(typeof window.saatzanConfigureBiometric!=='function'){alert('برای اثر انگشت، نسخه اندروید جدید را نصب کنید. این قابلیت در مرورگر قابل فعال‌سازی نیست.');$('biometricEnabled').checked=!!settings.biometricEnabled;return;}const ok=await window.saatzanConfigureBiometric(desired);if(ok){settings.biometricEnabled=desired;localStorage.setItem(settingsKey,JSON.stringify(settings));}else{$('biometricEnabled').checked=!!settings.biometricEnabled;}};
+$('month').value=localMonth();$('month').onchange=render;$('refresh').onclick=render;
+window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
+$('exportCsv').onclick=()=>{
+ const month=$('month').value||localMonth(), rows=[['تاریخ','ورود','خروج','کارکرد دقیقه','نوع ثبت','مدت ساعت','توضیحات']];
+ const labels={attendance:'حضور و غیاب',leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
+ records.filter(r=>r.date?.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>rows.push([displayDate(r.date),r.in?new Date(r.in).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',r.out?new Date(r.out).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',duration(r),labels[r.type]||r.type,r.duration||'',r.notes||'']));
+ const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`gozaresh-${month}.csv`;a.click();URL.revokeObjectURL(url);
+};
+$('recordDate').value=jalaliText(new Date());render();updateClock();setInterval(updateClock,1000);
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+<script src="biometric.bundle.js"></script>
+</body>
+  </html>
