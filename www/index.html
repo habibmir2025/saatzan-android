@@ -160,6 +160,17 @@ function jalaliMonthToISO(value){
  for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){const q=jalaliParts(d);if(q.y===jy&&q.m===jm)return `${d.getFullYear()}-${pad(d.getMonth()+1)}`;}
  return '';
 }
+function recordMatchesJalaliMonth(isoDate, selectedMonth){
+ const s=toLatinDigits(String(selectedMonth||'').trim()).replace(/[.-]/g,'/');
+ const m=s.match(/^(\d{4})\/(\d{1,2})$/);if(!m||!isoDate)return false;
+ const dmatch=String(isoDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!dmatch)return false;
+ const d=new Date(+dmatch[1],+dmatch[2]-1,+dmatch[3],12);const q=jalaliParts(d);
+ return q.y===+m[1] && q.m===+m[2];
+}
+function selectedJalaliMonth(){
+ const val=String($('month').value||'').trim();
+ return /^\d{4}[\/.-]\d{1,2}$/.test(toLatinDigits(val)) ? toLatinDigits(val).replace(/[.-]/g,'/') : isoMonthToJalali(localMonth());
+}
 function isoMonthToJalali(value){
  const m=String(value||'').match(/^(\d{4})-(\d{2})$/);if(!m)return jalaliText(new Date()).slice(0,7);
  const d=new Date(+m[1],+m[2]-1,15,12),q=jalaliParts(d);return `${faNum(q.y)}/${faNum(pad(q.m))}`;
@@ -190,8 +201,8 @@ function render(){
  const required=(Number($('requiredHours').value)||8)*60;
  $('todayOvertime').textContent=fmtHours(Math.max(0,mins-required)+extras(localDate(),'overtime'));
  $('status').textContent=!t?'وضعیت امروز: هنوز ورود ثبت نشده':t.in&&!t.out?`وضعیت امروز: در حال کار (ورود باز شماره ${faNum(todayRows.length)})`:`وضعیت امروز: ${faNum(todayRows.length)} نوبت ثبت شده`;
- const month=jalaliMonthToISO($('month').value)||localMonth();
- const monthRecords=records.filter(r=>r.date?.startsWith(month));
+ const month=selectedJalaliMonth();
+ const monthRecords=records.filter(r=>recordMatchesJalaliMonth(r.date,month));
  const worked=monthRecords.reduce((s,r)=>s+duration(r),0);
  const overtime=monthRecords.reduce((s,r)=>s+Math.max(0,duration(r)-required)+ (r.type==='overtime'?(Number(r.duration)||0)*60:0),0);
  const leave=monthRecords.filter(r=>r.type==='leave').reduce((s,r)=>s+(Number(r.duration)||0)*60,0);
@@ -223,40 +234,41 @@ $('saveExtra').onclick=()=>{const entered=$('recordDate').value.trim(),date=jala
 $('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
 $('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));updateClock()};
 $('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').checked;if(typeof window.saatzanConfigureBiometric!=='function'){alert('برای اثر انگشت، نسخه اندروید جدید را نصب کنید. این قابلیت در مرورگر قابل فعال‌سازی نیست.');$('biometricEnabled').checked=!!settings.biometricEnabled;return;}const ok=await window.saatzanConfigureBiometric(desired);if(ok){settings.biometricEnabled=desired;localStorage.setItem(settingsKey,JSON.stringify(settings));}else{$('biometricEnabled').checked=!!settings.biometricEnabled;}};
-$('month').value=localMonth();$('month').onchange=render;$('refresh').onclick=render;
 window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
 $('exportCsv').onclick=async()=>{
- const month=jalaliMonthToISO($('month').value)||localMonth();
- const rows=[['تاریخ شمسی','ورود','خروج','کارکرد دقیقه','نوع ثبت','مدت ساعت','مکان کاری','توضیحات']];
+ const month=selectedJalaliMonth();
+ if(!/^\d{4}\/\d{1,2}$/.test(month)){alert('ماه را به شکل سال/ماه وارد کنید؛ مثال ۱۴۰۵/۰۸.');return;}
+ const rows=[['تاریخ شمسی','ساعت ورود','ساعت خروج','کارکرد (دقیقه)','نوع ثبت','مدت (ساعت)','مکان کاری','توضیحات']];
  const labels={attendance:'حضور و غیاب',leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
- records.filter(r=>r.date?.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>rows.push([displayDate(r.date),r.in?new Date(r.in).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',r.out?new Date(r.out).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',duration(r),labels[r.type]||r.type,r.duration||'',r.workplace||'',r.notes||'']));
+ records.filter(r=>recordMatchesJalaliMonth(r.date,month)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
+   rows.push([displayDate(r.date),r.in?new Date(r.in).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',r.out?new Date(r.out).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',duration(r),labels[r.type]||r.type,r.duration||'',r.workplace||'',r.notes||'']);
+ });
  const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
- const filename=`gozaresh-${toLatinDigits(month).replace('-','_')}.csv`;
+ const filename=`gozaresh-${month.replace('/','_')}.csv`;
  try{
-   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
-   const file=new File([blob],filename,{type:'text/csv;charset=utf-8'});
-   if(navigator.canShare && navigator.canShare({files:[file]}) && navigator.share){
-     await navigator.share({files:[file],title:'گزارش ماهانه ساعت‌زن من',text:'فایل گزارش ماهانه برای باز کردن با Excel'});
+   if(window.saatzanExportFile && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
+     await window.saatzanExportFile(csv,filename);
      return;
    }
-   const url=URL.createObjectURL(blob),a=document.createElement('a');
-   a.href=url;a.download=filename;a.target='_blank';a.rel='noopener';
-   document.body.appendChild(a);a.click();a.remove();
-   setTimeout(()=>URL.revokeObjectURL(url),60000);
-   alert('اگر پنجره ذخیره یا اشتراک‌گذاری نمایش داده شد، ذخیره فایل را انتخاب کنید.');
+   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+   const url=URL.createObjectURL(blob);
+   const a=document.createElement('a');a.href=url;a.download=filename;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),120000);
+   if(rows.length===1) alert('برای این ماه رکوردی وجود ندارد؛ فایل خالی با عنوان ستون‌ها ساخته می‌شود.');
+   else alert('فایل گزارش ساخته شد. پوشه دانلودها را بررسی کنید.');
  }catch(err){
-   try{
-     const dataUrl='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-     const a=document.createElement('a');a.href=dataUrl;a.download=filename;a.target='_blank';document.body.appendChild(a);a.click();a.remove();
-     alert('اگر دانلود مستقیم پشتیبانی نشد، صفحه فایل باز می‌شود و می‌توانید آن را ذخیره کنید.');
-   }catch(e){alert('ساخت فایل خروجی ناموفق بود. برنامه را ببندید و دوباره باز کنید.');}
+   console.error('CSV export failed',err);
+   alert('خروجی فایل انجام نشد. لطفاً دوباره امتحان کنید یا از صفحه گزارش عکس بفرستید.');
  }
 };
-$('month').value=isoMonthToJalali(localMonth());
+$('month').value=jalaliText(new Date()).slice(0,7);
 $('month').addEventListener('change',render);
+$('month').addEventListener('input',()=>{if(/^\d{4}[\/.-]\d{1,2}$/.test(toLatinDigits($('month').value.trim())))render();});
+$('refresh').onclick=render;
 $('recordDate').value=jalaliText(new Date());render();updateClock();setInterval(updateClock,1000);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 <script src="biometric.bundle.js"></script>
+<script src="export.bundle.js"></script>
 </body>
 </html>
