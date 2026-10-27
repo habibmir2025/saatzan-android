@@ -127,6 +127,9 @@ const $ = id => document.getElementById(id);
 const storeKey = 'saatzan_records_v1';
 const settingsKey = 'saatzan_settings_v1';
 let records = JSON.parse(localStorage.getItem(storeKey) || '[]');
+if(!records.length && 'indexedDB' in window){
+ try{const req=indexedDB.open('saatzan_local_db',1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('appdata'))db.createObjectStore('appdata')};req.onsuccess=()=>{const db=req.result;try{const get=db.transaction('appdata','readonly').objectStore('appdata').get(storeKey);get.onsuccess=()=>{if(get.result){try{const restored=JSON.parse(get.result);if(Array.isArray(restored)&&restored.length){records=restored;localStorage.setItem(storeKey,JSON.stringify(records));render();}}catch(_){}}db.close();};get.onerror=()=>db.close();}catch(e){db.close();}};}catch(e){console.warn('IndexedDB restore failed',e);}
+}
 let settings = JSON.parse(localStorage.getItem(settingsKey) || '{"requiredHours":8}');
 settings = {requiredHours:8, workplaceName:'', biometricEnabled:false, ...settings};
 $('requiredHours').value = settings.requiredHours || 8;
@@ -150,10 +153,16 @@ function jalaliToISO(value){
  return null;
 }
 function displayDate(iso){if(!iso)return '—';const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return faNum(iso);return jalaliText(new Date(+m[1],+m[2]-1,+m[3],12))}
+function jalaliInputValue(iso){if(!iso)return '';const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return '';const d=new Date(+m[1],+m[2]-1,+m[3],12);const parts=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);const o={};parts.forEach(p=>{if(p.type!=='literal')o[p.type]=p.value});return `${o.year}/${String(o.month).padStart(2,'0')}/${String(o.day).padStart(2,'0')}`;}
+function jalaliInputToISO(value){const s=toLatinDigits(String(value||'').trim()).replace(/[.-]/g,'/');const m=s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);if(!m)return '';const jy=+m[1],jm=+m[2],jd=+m[3];if(jm<1||jm>12||jd<1||jd>31)return '';const target=`${jy}-${String(jm).padStart(2,'0')}-${String(jd).padStart(2,'0')}`;const fmt=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'});const start=new Date(jy+621,0,1,12);for(let delta=-120;delta<=400;delta++){const d=new Date(start);d.setDate(d.getDate()+delta);const ps=fmt.formatToParts(d);const o={};ps.forEach(p=>{if(p.type!=='literal')o[p.type]=p.value});if(+o.year===jy&&+o.month===jm&&+o.day===jd)return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}return '';}
 function updateClock(){const now=new Date();const el=$('liveClock');if(el)el.textContent=faNum(`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);const de=$('todayDate');if(de)de.textContent=now.toLocaleDateString('fa-IR-u-ca-persian',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const wp=$('workplaceDisplay');if(wp)wp.textContent=settings.workplaceName?`📍 ${settings.workplaceName}`:'📍 مکان کاری تنظیم نشده';}
 function time(d){return d?new Date(d).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit',hour12:false}):'—'}
 function fmtHours(mins){mins=Math.max(0,Math.round(mins||0));return `${faNum(Math.floor(mins/60))}:${faNum(pad(mins%60))}`}
-function save(){localStorage.setItem(storeKey,JSON.stringify(records));}
+function save(){
+ const payload=JSON.stringify(records);
+ try{localStorage.setItem(storeKey,payload);}catch(e){console.warn('localStorage save failed',e);}
+ try{const req=indexedDB.open('saatzan_local_db',1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('appdata'))db.createObjectStore('appdata')};req.onsuccess=()=>{const db=req.result;try{const tx=db.transaction('appdata','readwrite');tx.objectStore('appdata').put(payload,storeKey);tx.oncomplete=()=>db.close();tx.onerror=()=>db.close();}catch(e){db.close();}};}catch(e){console.warn('IndexedDB backup failed',e);}
+}
 function isAttendance(r){return r && (r.type==='attendance'||!r.type) && (r.in||r.out)}
 function todayAttendance(){return records.filter(r=>r.date===localDate()&&isAttendance(r)).sort((a,b)=>String(b.in||b.out||'').localeCompare(String(a.in||a.out||'')))}
 function getToday(){return todayAttendance()[0]||null}
@@ -183,7 +192,7 @@ function render(){
   return `<div class="entry"><div class="row"><strong>${displayDate(r.date||'')}</strong><span class="pill">${labels[r.type]||'حضور و غیاب'}</span></div>
   <div class="muted" style="margin:6px 0">کارکرد این نوبت: ${fmtHours(duration(r))}${r.duration?` | مدت ثبت: ${faNum(r.duration)} ساعت`:''}</div>
   ${isAttendance(r)?`<div class="grid" style="margin-top:8px">
-    <div><label>تاریخ</label><input type="date" id="editDate-${safeAttr(rid)}" value="${safeAttr(r.date||'')}"></div>
+    <div><label>تاریخ شمسی (سال/ماه/روز)</label><input type="text" inputmode="numeric" placeholder="۱۴۰۵/۰۸/۰۵" id="editDate-${safeAttr(rid)}" value="${safeAttr(jalaliInputValue(r.date||''))}"></div>
     <div><label>محل کار / مکان</label><input type="text" id="editPlace-${safeAttr(rid)}" value="${safeAttr(r.workplace||'')}" placeholder="مثلاً کارخانه، شعبه ۲"></div>
     <div><label>ساعت ورود</label><input type="datetime-local" id="editIn-${safeAttr(rid)}" value="${safeAttr(localInputValue(r.in))}"></div>
     <div><label>ساعت خروج</label><input type="datetime-local" id="editOut-${safeAttr(rid)}" value="${safeAttr(localInputValue(r.out))}"></div>
@@ -197,7 +206,7 @@ function newId(){return crypto.randomUUID?crypto.randomUUID():String(Date.now())
 function openAttendance(date){return records.filter(r=>r.date===date&&isAttendance(r)&&r.in&&!r.out).sort((a,b)=>String(b.in).localeCompare(String(a.in)))[0]||null}
 $('inBtn').onclick=()=>{const date=localDate();if(openAttendance(date)){alert('برای نوبت قبلی هنوز خروج ثبت نشده است. ابتدا خروج را ثبت کنید.');return}const now=new Date();records.push({id:newId(),date,type:'attendance',in:now.toISOString(),out:'',workplace:settings.workplaceName||''});save();render()};
 $('outBtn').onclick=()=>{const date=localDate();const r=openAttendance(date);if(!r){alert('ورود باز برای امروز پیدا نشد. ابتدا «ثبت ورود» را بزنید.');return}r.out=new Date().toISOString();save();render()};
-window.editAttendance=id=>{const r=records.find(x=>String(x.id)===String(id));if(!r)return;const date=$('editDate-'+id)?.value;const inValue=$('editIn-'+id)?.value||'';const outValue=$('editOut-'+id)?.value||'';const place=$('editPlace-'+id)?.value.trim()||'';if(!date){alert('تاریخ را وارد کنید.');return}const newIn=inputToISO(inValue),newOut=inputToISO(outValue);if(inValue&&!newIn){alert('ساعت ورود معتبر نیست.');return}if(outValue&&!newOut){alert('ساعت خروج معتبر نیست.');return}if(newIn&&newOut&&new Date(newOut)<new Date(newIn)){alert('ساعت خروج نمی‌تواند قبل از ساعت ورود باشد.');return}r.date=date;r.in=newIn;r.out=newOut;r.workplace=place;save();render();alert('تغییرات ذخیره شد.')};
+window.editAttendance=id=>{const r=records.find(x=>String(x.id)===String(id));if(!r)return;const date=jalaliInputToISO($('editDate-'+id)?.value);const inValue=$('editIn-'+id)?.value||'';const outValue=$('editOut-'+id)?.value||'';const place=$('editPlace-'+id)?.value.trim()||'';if(!date){alert('تاریخ شمسی را به شکل سال/ماه/روز وارد کنید؛ مثال ۱۴۰۵/۰۸/۰۵.');return}const newIn=inputToISO(inValue),newOut=inputToISO(outValue);if(inValue&&!newIn){alert('ساعت ورود معتبر نیست.');return}if(outValue&&!newOut){alert('ساعت خروج معتبر نیست.');return}if(newIn&&newOut&&new Date(newOut)<new Date(newIn)){alert('ساعت خروج نمی‌تواند قبل از ساعت ورود باشد.');return}r.date=date;r.in=newIn;r.out=newOut;r.workplace=place;save();render();alert('تغییرات ذخیره شد.')};
 $('saveExtra').onclick=()=>{const entered=$('recordDate').value.trim(),date=jalaliToISO(entered),type=$('kind').value,duration=Number($('duration').value)||0,notes=$('notes').value.trim();if(!date){alert('تاریخ شمسی را به شکل ۱۴۰۵/۰۸/۰۴ وارد کنید.');return}if(['leave','overtime'].includes(type)&&duration<=0){alert('مدت را به ساعت وارد کنید.');return}records.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type,duration,notes});save();$('duration').value='';$('notes').value='';$('recordDate').value=jalaliText(new Date());render()};
 $('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
 $('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));updateClock()};
