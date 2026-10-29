@@ -246,19 +246,25 @@ $('exportCsv').onclick=async()=>{
  const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
  const filename=`gozaresh-${month.replace('/','_')}.csv`;
  try{
-   if(window.saatzanExportFile && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
+   // In the Android app, prefer the native file/share plugins. Do not depend
+   // only on isNativePlatform(), which may be unavailable in some WebViews.
+   if(typeof window.saatzanExportFile === 'function'){
      await window.saatzanExportFile(csv,filename);
+     if(rows.length===1) alert('فایل گزارش این ماه ساخته شد؛ برای این ماه رکوردی ثبت نشده است.');
      return;
+   }
+   // Browser fallback for a normal web browser.
+   if(typeof Blob === 'undefined' || !window.URL || typeof URL.createObjectURL !== 'function'){
+     throw new Error('دانلود فایل در این محیط پشتیبانی نمی‌شود و ماژول اندروید هم بارگذاری نشده است.');
    }
    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
    const url=URL.createObjectURL(blob);
-   const a=document.createElement('a');a.href=url;a.download=filename;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
+   const a=document.createElement('a');a.href=url;a.download=filename;a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
    setTimeout(()=>URL.revokeObjectURL(url),120000);
-   if(rows.length===1) alert('برای این ماه رکوردی وجود ندارد؛ فایل خالی با عنوان ستون‌ها ساخته می‌شود.');
-   else alert('فایل گزارش ساخته شد. پوشه دانلودها را بررسی کنید.');
+   alert(rows.length===1?'فایل گزارش ساخته شد، اما برای این ماه رکوردی وجود ندارد.':'درخواست دانلود فایل ارسال شد. پوشه دانلودها را بررسی کنید.');
  }catch(err){
    console.error('CSV export failed',err);
-   alert('خروجی فایل انجام نشد. لطفاً دوباره امتحان کنید یا از صفحه گزارش عکس بفرستید.');
+   alert('خروجی فایل انجام نشد: '+(err && err.message ? err.message : String(err))+'\nلطفاً مطمئن شوید APK از آخرین اجرای موفق GitHub Actions ساخته شده است.');
  }
 };
 $('month').value=jalaliText(new Date()).slice(0,7);
