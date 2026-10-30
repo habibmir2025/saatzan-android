@@ -1,6 +1,6 @@
 {
   "name": "saatzan-android",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "scripts": {
     "build": "esbuild www/biometric.js --bundle --format=iife --outfile=www/biometric.bundle.js && esbuild www/export.js --bundle --format=iife --outfile=www/export.bundle.js"
