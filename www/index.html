@@ -253,6 +253,12 @@ $('exportCsv').onclick=async()=>{
      if(rows.length===1) alert('فایل گزارش این ماه ساخته شد؛ برای این ماه رکوردی ثبت نشده است.');
      return;
    }
+   // Never silently fall back to a browser download inside the installed APK:
+   // that path can show a success message without creating a user-visible file.
+   const isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
+   if(isNative){
+     throw new Error('ماژول ذخیره فایل اندروید در این APK بارگذاری نشده است. لطفاً نسخه APK جدید را نصب کنید.');
+   }
    // Browser fallback for a normal web browser.
    if(typeof Blob === 'undefined' || !window.URL || typeof URL.createObjectURL !== 'function'){
      throw new Error('دانلود فایل در این محیط پشتیبانی نمی‌شود و ماژول اندروید هم بارگذاری نشده است.');
