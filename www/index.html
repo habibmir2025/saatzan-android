@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#164e8a">
+<meta name="theme-color" content="#14532d">
 <script>
 try {
   const savedSettings = JSON.parse(localStorage.getItem('saatzan_settings_v1') || '{}');
@@ -15,31 +15,32 @@ try {
 <link rel="manifest" href="manifest.webmanifest">
 <title>ساعت‌زن من</title>
 <style>
-:root{font-family:Tahoma,Arial,sans-serif;color:#172554;background:#f3f7ff}
-*{box-sizing:border-box}body{margin:0}header{background:#164e8a;color:white;padding:22px 18px 26px;border-radius:0 0 24px 24px}
+:root{font-family:Tahoma,Arial,sans-serif;color:#17211b;background:#f3f6f3}
+*{box-sizing:border-box}body{margin:0}header{background:#14532d;color:white;padding:22px 18px 26px;border-radius:0 0 24px 24px}
 h1{font-size:22px;margin:0 0 8px} .sub{opacity:.85;font-size:13px}
 main{max-width:720px;margin:auto;padding:14px}
 .card{background:white;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 3px 14px #17351d0d}
-.clock{text-align:center;font-size:30px;font-weight:bold;margin:12px 0 4px;direction:ltr;font-variant-numeric:tabular-nums}.clock-info{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.workplace-badge{font-size:13px;background:#ffffff20;border:1px solid #ffffff35;border-radius:999px;padding:7px 10px;max-width:100%;overflow-wrap:anywhere}.biometric-lock{display:none;position:fixed;inset:0;z-index:9999;background:#f3f7ff;align-items:center;justify-content:center;padding:24px;text-align:center}.biometric-lock .lock-card{max-width:420px;width:100%;background:white;border-radius:20px;padding:28px;box-shadow:0 8px 30px #0002}.biometric-lock button{margin-top:12px;width:100%}.biometric-required #biometricLock{display:flex}
-.date{text-align:center;color:#64748b;font-size:13px}
-.status{text-align:center;margin:10px auto 14px;color:#164e8a;font-weight:bold}
+.clock{text-align:center;font-size:30px;font-weight:bold;margin:12px 0 4px;direction:ltr;font-variant-numeric:tabular-nums}.clock-info{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.workplace-badge{font-size:13px;background:#ffffff20;border:1px solid #ffffff35;border-radius:999px;padding:7px 10px;max-width:100%;overflow-wrap:anywhere}.biometric-lock{display:none;position:fixed;inset:0;z-index:9999;background:#f3f6f3;align-items:center;justify-content:center;padding:24px;text-align:center}.biometric-lock .lock-card{max-width:420px;width:100%;background:white;border-radius:20px;padding:28px;box-shadow:0 8px 30px #0002}.biometric-lock button{margin-top:12px;width:100%}.biometric-required #biometricLock{display:flex}
+.date{text-align:center;color:#647067;font-size:13px}
+.status{text-align:center;margin:10px auto 14px;color:#14532d;font-weight:bold}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 button,.btn{border:0;border-radius:12px;padding:13px 10px;font:inherit;font-weight:bold;cursor:pointer}
-.primary{background:#2563eb;color:white}.secondary{background:#dbeafe;color:#164e8a}.danger{background:#fee2e2;color:#991b1b}
+.primary{background:#166534;color:white}.secondary{background:#e5efe7;color:#14532d}.danger{background:#fee2e2;color:#991b1b}
 label{display:block;font-size:13px;margin:10px 0 6px;color:#3f4b42}
-input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;background:#fff}
+input,select,textarea{width:100%;padding:12px;border:1px solid #d5ded7;border-radius:10px;font:inherit;background:#fff}
 textarea{min-height:75px;resize:vertical}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.metric{background:#eff6ff;border-radius:12px;padding:12px}
+.metric{background:#f0f7f1;border-radius:12px;padding:12px}
 .metric small{display:block;color:#5e6e61;margin-bottom:6px}.metric strong{font-size:20px}
 h2{font-size:17px;margin:0 0 10px}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.entry{border-top:1px solid #e2e8f0;padding:12px 0}
+.entry{border-top:1px solid #edf0ed;padding:12px 0}
 .entry:first-child{border-top:0}.muted{font-size:12px;color:#66736a}
-.pill{display:inline-block;background:#dbeafe;color:#2563eb;border-radius:30px;padding:4px 8px;font-size:12px}
+.pill{display:inline-block;background:#e8f5e9;color:#166534;border-radius:30px;padding:4px 8px;font-size:12px}
 table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:8px 5px;border-bottom:1px solid #e8eee9;text-align:right}
 .tablewrap{overflow:auto}
-.note{font-size:12px;color:#64748b;line-height:1.8}
+.note{font-size:12px;color:#647067;line-height:1.8}
+.app-nav{display:flex;gap:8px;margin:10px 0;position:sticky;top:0;z-index:10;background:#f3f7ff;padding:8px;border-radius:14px}.app-nav button{flex:1;padding:10px 6px} [hidden]{display:none!important}
 footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 @media(min-width:600px){.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
 </style>
@@ -74,6 +75,22 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
   </div>
 </div>
 <main>
+<nav class="app-nav" aria-label="بخش‌های برنامه">
+<button class="secondary" data-view="home">خانه</button>
+<button class="secondary" data-view="historyPage">سوابق</button>
+<button class="secondary" data-view="backupPage">پشتیبان‌گیری</button>
+</nav>
+<section class="card" id="backupPage" hidden>
+<h2>پشتیبان‌گیری و بازیابی</h2>
+<p class="note">برای نگهداری امن از سوابق و تنظیمات، یک فایل پشتیبان بسازید. فایل در پوشه اختصاصی Saatzan/Backup ذخیره می‌شود و امکان اشتراک‌گذاری یا ذخیره در مکان دیگری را هم دارید.</p>
+<div class="actions">
+<button class="primary" id="backupExport">تهیه پشتیبان</button>
+<button class="secondary" id="backupImportBtn">بازیابی از فایل</button>
+</div>
+<input type="file" id="backupFile" accept="application/json,.json" hidden>
+<p class="note">بازیابی، سوابق و تنظیمات فعلی را با محتوای فایل پشتیبان جایگزین می‌کند.</p>
+</section>
+
 <section class="card">
 <div class="status" id="status">وضعیت امروز: هنوز ورود ثبت نشده</div>
 <div class="actions">
@@ -116,18 +133,7 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 </section>
 </div>
 
-<section class="card" id="backupSection">
-<h2>پشتیبان‌گیری و بازیابی</h2>
-<p class="note">یک نسخه از سوابق حضور و غیاب، مرخصی‌ها و تنظیمات برنامه ذخیره کنید. فایل پشتیبان را در جای امن نگه دارید.</p>
-<div class="actions">
-<button class="primary" id="backupExport">تهیه فایل پشتیبان</button>
-<button class="secondary" id="backupImportBtn">بازیابی از فایل</button>
-</div>
-<input type="file" id="backupFile" accept="application/json,.json" style="display:none">
-<p class="note">بازیابی، اطلاعات فعلی برنامه را با اطلاعات داخل فایل پشتیبان جایگزین می‌کند.</p>
-</section>
-
-<section class="card">
+<section class="card" id="historyPage" hidden>
 <div class="row"><h2>سوابق ماه</h2><button class="secondary" id="refresh">به‌روزرسانی</button></div>
 <div id="entries"></div>
 </section>
@@ -241,44 +247,7 @@ function openAttendance(date){return records.filter(r=>r.date===date&&isAttendan
 $('inBtn').onclick=()=>{const date=localDate();if(openAttendance(date)){alert('برای نوبت قبلی هنوز خروج ثبت نشده است. ابتدا خروج را ثبت کنید.');return}const now=new Date();records.push({id:newId(),date,type:'attendance',in:now.toISOString(),out:'',workplace:settings.workplaceName||''});save();render()};
 $('outBtn').onclick=()=>{const date=localDate();const r=openAttendance(date);if(!r){alert('ورود باز برای امروز پیدا نشد. ابتدا «ثبت ورود» را بزنید.');return}r.out=new Date().toISOString();save();render()};
 window.editAttendance=id=>{const r=records.find(x=>String(x.id)===String(id));if(!r)return;const date=jalaliInputToISO($('editDate-'+id)?.value);const inValue=$('editIn-'+id)?.value||'';const outValue=$('editOut-'+id)?.value||'';const place=$('editPlace-'+id)?.value.trim()||'';if(!date){alert('تاریخ شمسی را به شکل سال/ماه/روز وارد کنید؛ مثال ۱۴۰۵/۰۸/۰۵.');return}const newIn=inputToISO(inValue),newOut=inputToISO(outValue);if(inValue&&!newIn){alert('ساعت ورود معتبر نیست.');return}if(outValue&&!newOut){alert('ساعت خروج معتبر نیست.');return}if(newIn&&newOut&&new Date(newOut)<new Date(newIn)){alert('ساعت خروج نمی‌تواند قبل از ساعت ورود باشد.');return}r.date=date;r.in=newIn;r.out=newOut;r.workplace=place;save();render();alert('تغییرات ذخیره شد.')};
-$('saveExtra').onclick=()=>{const entered=$('recordDate').value.trim(),date=jalaliToISO(entered),type=$('kind').value,duration=Number($('duration').value)||0,notes=$('notes').value.trim();if(!date){alert('تاریخ شمسی را به شکل ۱۴۰۵/۰۸/۰۴ وارد کنید.');return}if(['leave','overtime'].includes(type)&&duration<=0){alert('مدت را به ساعت وارد کنید.');return}records.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type,duration,notes});save();$('duration').value='';$('notes').value='';// Backup / restore: export both records and app settings as a portable JSON file.
-$('backupExport').onclick=async()=>{
-  const payload={format:'saatzan-backup',version:1,createdAt:new Date().toISOString(),records,settings};
-  const content=JSON.stringify(payload,null,2);
-  const filename='saatzan-backup-'+localDate()+'.json';
-  if(typeof window.saatzanExportFile==='function'){
-    await window.saatzanExportFile(content,filename);
-    alert('فایل پشتیبان آماده شد. از پنجره بازشده گزینه ذخیره را انتخاب کنید.');
-    return;
-  }
-  const blob=new Blob([content],{type:'application/json;charset=utf-8'});
-  const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download=filename;a.rel='noopener';a.style.display='none';
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),120000);
-  alert('درخواست ذخیره فایل پشتیبان انجام شد. پوشه دانلودها را بررسی کنید.');
-};
-$('backupImportBtn').onclick=()=>$('backupFile').click();
-$('backupFile').onchange=async(e)=>{
-  const file=e.target.files&&e.target.files[0];if(!file)return;
-  try{
-    const data=JSON.parse(await file.text());
-    if(!data||data.format!=='saatzan-backup'||!Array.isArray(data.records)||!data.settings||typeof data.settings!=='object')
-      throw new Error('ساختار فایل پشتیبان معتبر نیست.');
-    if(!confirm('اطلاعات فعلی با فایل پشتیبان جایگزین شود؟'))return;
-    records=data.records;
-    settings={requiredHours:8,workplaceName:'',biometricEnabled:false,...data.settings};
-    localStorage.setItem(storeKey,JSON.stringify(records));
-    localStorage.setItem(settingsKey,JSON.stringify(settings));
-    $('requiredHours').value=settings.requiredHours||8;
-    $('workplaceName').value=settings.workplaceName||'';
-    $('biometricEnabled').checked=!!settings.biometricEnabled;
-    render();updateClock();
-    alert('بازیابی اطلاعات با موفقیت انجام شد.');
-  }catch(err){alert('بازیابی انجام نشد: '+(err.message||String(err)));}
-  finally{$('backupFile').value='';}
-};
-$('recordDate').value=jalaliText(new Date());render()};
+$('saveExtra').onclick=()=>{const entered=$('recordDate').value.trim(),date=jalaliToISO(entered),type=$('kind').value,duration=Number($('duration').value)||0,notes=$('notes').value.trim();if(!date){alert('تاریخ شمسی را به شکل ۱۴۰۵/۰۸/۰۴ وارد کنید.');return}if(['leave','overtime'].includes(type)&&duration<=0){alert('مدت را به ساعت وارد کنید.');return}records.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type,duration,notes});save();$('duration').value='';$('notes').value='';$('recordDate').value=jalaliText(new Date());render()};
 $('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
 $('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));updateClock()};
 $('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').checked;if(typeof window.saatzanConfigureBiometric!=='function'){alert('برای اثر انگشت، نسخه اندروید جدید را نصب کنید. این قابلیت در مرورگر قابل فعال‌سازی نیست.');$('biometricEnabled').checked=!!settings.biometricEnabled;return;}const ok=await window.saatzanConfigureBiometric(desired);if(ok){settings.biometricEnabled=desired;localStorage.setItem(settingsKey,JSON.stringify(settings));}else{$('biometricEnabled').checked=!!settings.biometricEnabled;}};
@@ -320,6 +289,49 @@ $('exportCsv').onclick=async()=>{
    console.error('CSV export failed',err);
    alert('خروجی فایل انجام نشد: '+(err && err.message ? err.message : String(err))+'\nلطفاً مطمئن شوید APK از آخرین اجرای موفق GitHub Actions ساخته شده است.');
  }
+};
+// Separate in-app views for home, history and backup.
+document.querySelectorAll('[data-view]').forEach(btn=>btn.onclick=()=>{
+ const view=btn.dataset.view;
+ $('historyPage').hidden=view!=='historyPage';
+ $('backupPage').hidden=view!=='backupPage';
+ document.querySelectorAll('main > section.card, main > .two').forEach(el=>{
+   if(el.id==='historyPage'||el.id==='backupPage')return;
+   el.hidden=view!=='home';
+ });
+});
+$('backupExport').onclick=async()=>{
+ try{
+  const payload={format:'saatzan-backup',version:1,createdAt:new Date().toISOString(),records,settings};
+  const content=JSON.stringify(payload,null,2);
+  const filename='saatzan-backup-'+localDate()+'.json';
+  if(typeof window.saatzanExportFile==='function'){
+    await window.saatzanExportFile(content,filename,'backup');
+    alert('فایل پشتیبان ساخته شد. از پنجره بازشده ذخیره یا اشتراک‌گذاری را انتخاب کنید.');
+    return;
+  }
+  if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
+    throw new Error('امکان ذخیره‌سازی در این نسخه اندروید بارگذاری نشده؛ APK جدید را نصب کنید.');
+  const blob=new Blob([content],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  alert('فایل پشتیبان آماده دانلود است.');
+ }catch(err){console.error(err);alert('پشتیبان‌گیری ناموفق بود: '+(err.message||String(err)));}
+};
+$('backupImportBtn').onclick=()=>$('backupFile').click();
+$('backupFile').onchange=async e=>{
+ const file=e.target.files&&e.target.files[0];if(!file)return;
+ try{
+  const data=JSON.parse(await file.text());
+  if(data.format!=='saatzan-backup'||!Array.isArray(data.records)||!data.settings)throw new Error('فایل انتخاب‌شده پشتیبان معتبر ساعت‌زن نیست.');
+  if(!confirm('اطلاعات فعلی با نسخه پشتیبان جایگزین شود؟'))return;
+  records=data.records;settings={requiredHours:8,workplaceName:'',biometricEnabled:false,...data.settings};
+  localStorage.setItem(storeKey,JSON.stringify(records));localStorage.setItem(settingsKey,JSON.stringify(settings));
+  $('requiredHours').value=settings.requiredHours||8;$('workplaceName').value=settings.workplaceName||'';$('biometricEnabled').checked=!!settings.biometricEnabled;
+  render();updateClock();alert('بازیابی انجام شد.');
+ }catch(err){alert('بازیابی ناموفق بود: '+(err.message||String(err)));}
+ finally{e.target.value='';}
 };
 $('month').value=jalaliText(new Date()).slice(0,7);
 $('month').addEventListener('change',render);
