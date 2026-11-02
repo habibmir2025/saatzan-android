@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#164e8a">
+<meta name="theme-color" content="#14532d">
 <script>
 try {
   const savedSettings = JSON.parse(localStorage.getItem('saatzan_settings_v1') || '{}');
@@ -15,31 +15,32 @@ try {
 <link rel="manifest" href="manifest.webmanifest">
 <title>ساعت‌زن من</title>
 <style>
-:root{font-family:Tahoma,Arial,sans-serif;color:#172554;background:#f3f7ff}
-*{box-sizing:border-box}body{margin:0}header{background:#164e8a;color:white;padding:22px 18px 26px;border-radius:0 0 24px 24px}
+:root{font-family:Tahoma,Arial,sans-serif;color:#17211b;background:#f3f6f3}
+*{box-sizing:border-box}body{margin:0}header{background:#14532d;color:white;padding:22px 18px 26px;border-radius:0 0 24px 24px}
 h1{font-size:22px;margin:0 0 8px} .sub{opacity:.85;font-size:13px}
 main{max-width:720px;margin:auto;padding:14px}
 .card{background:white;border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 3px 14px #17351d0d}
-.clock{text-align:center;font-size:30px;font-weight:bold;margin:12px 0 4px;direction:ltr;font-variant-numeric:tabular-nums}.clock-info{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.workplace-badge{font-size:13px;background:#ffffff20;border:1px solid #ffffff35;border-radius:999px;padding:7px 10px;max-width:100%;overflow-wrap:anywhere}.biometric-lock{display:none;position:fixed;inset:0;z-index:9999;background:#f3f7ff;align-items:center;justify-content:center;padding:24px;text-align:center}.biometric-lock .lock-card{max-width:420px;width:100%;background:white;border-radius:20px;padding:28px;box-shadow:0 8px 30px #0002}.biometric-lock button{margin-top:12px;width:100%}.biometric-required #biometricLock{display:flex}
-.date{text-align:center;color:#64748b;font-size:13px}
-.status{text-align:center;margin:10px auto 14px;color:#164e8a;font-weight:bold}
+.clock{text-align:center;font-size:30px;font-weight:bold;margin:12px 0 4px;direction:ltr;font-variant-numeric:tabular-nums}.clock-info{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.workplace-badge{font-size:13px;background:#ffffff20;border:1px solid #ffffff35;border-radius:999px;padding:7px 10px;max-width:100%;overflow-wrap:anywhere}.biometric-lock{display:none;position:fixed;inset:0;z-index:9999;background:#f3f6f3;align-items:center;justify-content:center;padding:24px;text-align:center}.biometric-lock .lock-card{max-width:420px;width:100%;background:white;border-radius:20px;padding:28px;box-shadow:0 8px 30px #0002}.biometric-lock button{margin-top:12px;width:100%}.biometric-required #biometricLock{display:flex}
+.date{text-align:center;color:#647067;font-size:13px}
+.status{text-align:center;margin:10px auto 14px;color:#14532d;font-weight:bold}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 button,.btn{border:0;border-radius:12px;padding:13px 10px;font:inherit;font-weight:bold;cursor:pointer}
-.primary{background:#2563eb;color:white}.secondary{background:#dbeafe;color:#164e8a}.danger{background:#fee2e2;color:#991b1b}
+.primary{background:#166534;color:white}.secondary{background:#e5efe7;color:#14532d}.danger{background:#fee2e2;color:#991b1b}
 label{display:block;font-size:13px;margin:10px 0 6px;color:#3f4b42}
-input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;background:#fff}
+input,select,textarea{width:100%;padding:12px;border:1px solid #d5ded7;border-radius:10px;font:inherit;background:#fff}
 textarea{min-height:75px;resize:vertical}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.metric{background:#eff6ff;border-radius:12px;padding:12px}
+.metric{background:#f0f7f1;border-radius:12px;padding:12px}
 .metric small{display:block;color:#5e6e61;margin-bottom:6px}.metric strong{font-size:20px}
 h2{font-size:17px;margin:0 0 10px}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.entry{border-top:1px solid #e2e8f0;padding:12px 0}
+.entry{border-top:1px solid #edf0ed;padding:12px 0}
 .entry:first-child{border-top:0}.muted{font-size:12px;color:#66736a}
-.pill{display:inline-block;background:#dbeafe;color:#2563eb;border-radius:30px;padding:4px 8px;font-size:12px}
-table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:8px 5px;border-bottom:1px solid #e2e8f0;text-align:right}
+.pill{display:inline-block;background:#e8f5e9;color:#166534;border-radius:30px;padding:4px 8px;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:8px 5px;border-bottom:1px solid #e8eee9;text-align:right}
 .tablewrap{overflow:auto}
-.note{font-size:12px;color:#64748b;line-height:1.8}
+.note{font-size:12px;color:#647067;line-height:1.8}
+.app-nav{display:flex;gap:8px;margin:10px 0;position:sticky;top:0;z-index:10;background:#f3f7ff;padding:8px;border-radius:14px}.app-nav button{flex:1;padding:10px 6px} [hidden]{display:none!important}
 footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 @media(min-width:600px){.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
 </style>
@@ -74,6 +75,22 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
   </div>
 </div>
 <main>
+<nav class="app-nav" aria-label="بخش‌های برنامه">
+<button class="secondary" data-view="home">خانه</button>
+<button class="secondary" data-view="historyPage">سوابق</button>
+<button class="secondary" data-view="backupPage">پشتیبان‌گیری</button>
+</nav>
+<section class="card" id="backupPage" hidden>
+<h2>پشتیبان‌گیری و بازیابی</h2>
+<p class="note">برای نگهداری امن از سوابق و تنظیمات، یک فایل پشتیبان بسازید. فایل در پوشه اختصاصی Saatzan/Backup ذخیره می‌شود و امکان اشتراک‌گذاری یا ذخیره در مکان دیگری را هم دارید.</p>
+<div class="actions">
+<button class="primary" id="backupExport">تهیه پشتیبان</button>
+<button class="secondary" id="backupImportBtn">بازیابی از فایل</button>
+</div>
+<input type="file" id="backupFile" accept="application/json,.json" hidden>
+<p class="note">بازیابی، سوابق و تنظیمات فعلی را با محتوای فایل پشتیبان جایگزین می‌کند.</p>
+</section>
+
 <section class="card">
 <div class="status" id="status">وضعیت امروز: هنوز ورود ثبت نشده</div>
 <div class="actions">
@@ -104,7 +121,7 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 <label for="requiredHours">ساعت کار موظفی روزانه</label><input type="number" id="requiredHours" min="1" max="24" step="0.5" value="8">
 <label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="biometricEnabled" style="width:20px;height:20px"> باز شدن برنامه با اثر انگشت / قفل گوشی</label>
 <p class="note">قفل اثر انگشت فقط در نسخه نصب‌شده اندروید و با ثبت اثر انگشت یا قفل صفحه در تنظیمات گوشی کار می‌کند.</p>
-<label for="month">گزارش ماهانه</label><input type="month" id="month">
+<label for="month">گزارش ماهانه (شمسی: سال/ماه)</label><input type="text" id="month" inputmode="numeric" placeholder="۱۴۰۵/۰۸" autocomplete="off">
 <div class="grid" style="margin-top:12px">
 <div class="metric"><small>مجموع کارکرد</small><strong id="monthHours">۰:۰۰</strong></div>
 <div class="metric"><small>مجموع اضافه‌کاری</small><strong id="monthOvertime">۰:۰۰</strong></div>
@@ -116,18 +133,7 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 </section>
 </div>
 
-<section class="card" id="backupSection">
-<h2>پشتیبان‌گیری و بازیابی</h2>
-<p class="note">یک نسخه از سوابق حضور و غیاب، مرخصی‌ها و تنظیمات برنامه ذخیره کنید. فایل پشتیبان را در جای امن نگه دارید.</p>
-<div class="actions">
-<button class="primary" id="backupExport">تهیه فایل پشتیبان</button>
-<button class="secondary" id="backupImportBtn">بازیابی از فایل</button>
-</div>
-<input type="file" id="backupFile" accept="application/json,.json" style="display:none">
-<p class="note">بازیابی، اطلاعات فعلی برنامه را با اطلاعات داخل فایل پشتیبان جایگزین می‌کند.</p>
-</section>
-
-<section class="card">
+<section class="card" id="historyPage" hidden>
 <div class="row"><h2>سوابق ماه</h2><button class="secondary" id="refresh">به‌روزرسانی</button></div>
 <div id="entries"></div>
 </section>
@@ -138,6 +144,9 @@ const $ = id => document.getElementById(id);
 const storeKey = 'saatzan_records_v1';
 const settingsKey = 'saatzan_settings_v1';
 let records = JSON.parse(localStorage.getItem(storeKey) || '[]');
+if(!records.length && 'indexedDB' in window){
+ try{const req=indexedDB.open('saatzan_local_db',1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('appdata'))db.createObjectStore('appdata')};req.onsuccess=()=>{const db=req.result;try{const get=db.transaction('appdata','readonly').objectStore('appdata').get(storeKey);get.onsuccess=()=>{if(get.result){try{const restored=JSON.parse(get.result);if(Array.isArray(restored)&&restored.length){records=restored;localStorage.setItem(storeKey,JSON.stringify(records));render();}}catch(_){}}db.close();};get.onerror=()=>db.close();}catch(e){db.close();}};}catch(e){console.warn('IndexedDB restore failed',e);}
+}
 let settings = JSON.parse(localStorage.getItem(settingsKey) || '{"requiredHours":8}');
 settings = {requiredHours:8, workplaceName:'', biometricEnabled:false, ...settings};
 $('requiredHours').value = settings.requiredHours || 8;
@@ -155,33 +164,62 @@ function jalaliParts(date=new Date()){
 function jalaliText(date=new Date()){const p=jalaliParts(date);return `${faNum(p.y)}/${faNum(pad(p.m))}/${faNum(pad(p.d))}`}
 function jalaliToISO(value){
  const m=toLatinDigits(value).trim().match(/^(\d{4})[\/.-](\d{1,2})[\/.-](\d{1,2})$/);
-function save(){
-  localStorage.setItem(storeKey,JSON.stringify(records));
-  if(window.saatzanCloud){
-    records.forEach(r=>window.saatzanCloud.upsert(r));
-  }
-} if(!m)return null;const jy=+m[1],jm=+m[2],jd=+m[3];if(jm<1||jm>12||jd<1||jd>31)return null;
+ if(!m)return null;const jy=+m[1],jm=+m[2],jd=+m[3];if(jm<1||jm>12||jd<1||jd>31)return null;
  const start=new Date(jy+621,2,1,12),end=new Date(jy+623,3,1,12);
  for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){const p=jalaliParts(d);if(p.y===jy&&p.m===jm&&p.d===jd)return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
  return null;
 }
+function jalaliMonthToISO(value){
+ const s=toLatinDigits(String(value||'').trim()).replace(/[.-]/g,'/');
+ const m=s.match(/^(\d{4})\/(\d{1,2})$/);if(!m)return '';
+ const jy=+m[1],jm=+m[2];if(jm<1||jm>12)return '';
+ const start=new Date(jy+621,0,1,12),end=new Date(jy+623,0,1,12);
+ for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){const q=jalaliParts(d);if(q.y===jy&&q.m===jm)return `${d.getFullYear()}-${pad(d.getMonth()+1)}`;}
+ return '';
+}
+function recordMatchesJalaliMonth(isoDate, selectedMonth){
+ const s=toLatinDigits(String(selectedMonth||'').trim()).replace(/[.-]/g,'/');
+ const m=s.match(/^(\d{4})\/(\d{1,2})$/);if(!m||!isoDate)return false;
+ const dmatch=String(isoDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!dmatch)return false;
+ const d=new Date(+dmatch[1],+dmatch[2]-1,+dmatch[3],12);const q=jalaliParts(d);
+ return q.y===+m[1] && q.m===+m[2];
+}
+function selectedJalaliMonth(){
+ const val=String($('month').value||'').trim();
+ return /^\d{4}[\/.-]\d{1,2}$/.test(toLatinDigits(val)) ? toLatinDigits(val).replace(/[.-]/g,'/') : isoMonthToJalali(localMonth());
+}
+function isoMonthToJalali(value){
+ const m=String(value||'').match(/^(\d{4})-(\d{2})$/);if(!m)return jalaliText(new Date()).slice(0,7);
+ const d=new Date(+m[1],+m[2]-1,15,12),q=jalaliParts(d);return `${faNum(q.y)}/${faNum(pad(q.m))}`;
+}
 function displayDate(iso){if(!iso)return '—';const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return faNum(iso);return jalaliText(new Date(+m[1],+m[2]-1,+m[3],12))}
+function jalaliInputValue(iso){if(!iso)return '';const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return '';const d=new Date(+m[1],+m[2]-1,+m[3],12);const parts=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);const o={};parts.forEach(p=>{if(p.type!=='literal')o[p.type]=p.value});return `${o.year}/${String(o.month).padStart(2,'0')}/${String(o.day).padStart(2,'0')}`;}
+function jalaliInputToISO(value){const s=toLatinDigits(String(value||'').trim()).replace(/[.-]/g,'/');const m=s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);if(!m)return '';const jy=+m[1],jm=+m[2],jd=+m[3];if(jm<1||jm>12||jd<1||jd>31)return '';const target=`${jy}-${String(jm).padStart(2,'0')}-${String(jd).padStart(2,'0')}`;const fmt=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'});const start=new Date(jy+621,0,1,12);for(let delta=-120;delta<=400;delta++){const d=new Date(start);d.setDate(d.getDate()+delta);const ps=fmt.formatToParts(d);const o={};ps.forEach(p=>{if(p.type!=='literal')o[p.type]=p.value});if(+o.year===jy&&+o.month===jm&&+o.day===jd)return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}return '';}
 function updateClock(){const now=new Date();const el=$('liveClock');if(el)el.textContent=faNum(`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);const de=$('todayDate');if(de)de.textContent=now.toLocaleDateString('fa-IR-u-ca-persian',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const wp=$('workplaceDisplay');if(wp)wp.textContent=settings.workplaceName?`📍 ${settings.workplaceName}`:'📍 مکان کاری تنظیم نشده';}
 function time(d){return d?new Date(d).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit',hour12:false}):'—'}
 function fmtHours(mins){mins=Math.max(0,Math.round(mins||0));return `${faNum(Math.floor(mins/60))}:${faNum(pad(mins%60))}`}
-function save(){localStorage.setItem(storeKey,JSON.stringify(records));}
-function getToday(){return records.find(r=>r.date===localDate() && (r.type==='attendance'||!r.type))}
+function save(){
+ const payload=JSON.stringify(records);
+ try{localStorage.setItem(storeKey,payload);}catch(e){console.warn('localStorage save failed',e);}
+ try{const req=indexedDB.open('saatzan_local_db',1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('appdata'))db.createObjectStore('appdata')};req.onsuccess=()=>{const db=req.result;try{const tx=db.transaction('appdata','readwrite');tx.objectStore('appdata').put(payload,storeKey);tx.oncomplete=()=>db.close();tx.onerror=()=>db.close();}catch(e){db.close();}};}catch(e){console.warn('IndexedDB backup failed',e);}
+}
+function isAttendance(r){return r && (r.type==='attendance'||!r.type) && (r.in||r.out)}
+function todayAttendance(){return records.filter(r=>r.date===localDate()&&isAttendance(r)).sort((a,b)=>String(b.in||b.out||'').localeCompare(String(a.in||a.out||'')))}
+function getToday(){return todayAttendance()[0]||null}
 function duration(r){return r?.in && r?.out ? Math.max(0,Math.round((new Date(r.out)-new Date(r.in))/60000)) : 0}
+function localInputValue(iso){if(!iso)return '';const d=new Date(iso);if(Number.isNaN(d.getTime()))return '';return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
+function inputToISO(value){if(!value)return '';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toISOString()}
+function safeAttr(s){return escapeHtml(s||'')}
 function extras(date,kind){return records.filter(r=>r.date===date && r.type===kind).reduce((s,r)=>s+(Number(r.duration)||0)*60,0)}
 function render(){
  updateClock();
- const t=getToday(); $('todayIn').textContent=time(t?.in); $('todayOut').textContent=time(t?.out);
- const mins=duration(t); $('todayHours').textContent=fmtHours(mins);
+ const todayRows=todayAttendance(); const t=todayRows[0]; $('todayIn').textContent=todayRows.length?time(todayRows[todayRows.length-1].in):'—'; $('todayOut').textContent=t?time(t.out):'—';
+ const mins=todayRows.reduce((sum,r)=>sum+duration(r),0); $('todayHours').textContent=fmtHours(mins);
  const required=(Number($('requiredHours').value)||8)*60;
  $('todayOvertime').textContent=fmtHours(Math.max(0,mins-required)+extras(localDate(),'overtime'));
- $('status').textContent=!t?'وضعیت امروز: هنوز ورود ثبت نشده':t.in&&!t.out?'وضعیت امروز: در حال کار':`وضعیت امروز: خروج ثبت شده`;
- const month=$('month').value||localMonth();
- const monthRecords=records.filter(r=>r.date?.startsWith(month));
+ $('status').textContent=!t?'وضعیت امروز: هنوز ورود ثبت نشده':t.in&&!t.out?`وضعیت امروز: در حال کار (ورود باز شماره ${faNum(todayRows.length)})`:`وضعیت امروز: ${faNum(todayRows.length)} نوبت ثبت شده`;
+ const month=selectedJalaliMonth();
+ const monthRecords=records.filter(r=>recordMatchesJalaliMonth(r.date,month));
  const worked=monthRecords.reduce((s,r)=>s+duration(r),0);
  const overtime=monthRecords.reduce((s,r)=>s+Math.max(0,duration(r)-required)+ (r.type==='overtime'?(Number(r.duration)||0)*60:0),0);
  const leave=monthRecords.filter(r=>r.type==='leave').reduce((s,r)=>s+(Number(r.duration)||0)*60,0);
@@ -190,72 +228,119 @@ function render(){
  const list=monthRecords.slice().sort((a,b)=>b.date.localeCompare(a.date));
  $('entries').innerHTML=list.length?list.map(r=>{
   const labels={leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
+  const rid=String(r.id);
   return `<div class="entry"><div class="row"><strong>${displayDate(r.date||'')}</strong><span class="pill">${labels[r.type]||'حضور و غیاب'}</span></div>
-  <div class="muted" style="margin-top:6px">ورود: ${time(r.in)} | خروج: ${time(r.out)} | کارکرد: ${fmtHours(duration(r))}${r.duration?` | مدت ثبت: ${faNum(r.duration)} ساعت`:''}</div>
+  <div class="muted" style="margin:6px 0">کارکرد این نوبت: ${fmtHours(duration(r))}${r.duration?` | مدت ثبت: ${faNum(r.duration)} ساعت`:''}</div>
+  ${isAttendance(r)?`<div class="grid" style="margin-top:8px">
+    <div><label>تاریخ شمسی (سال/ماه/روز)</label><input type="text" inputmode="numeric" placeholder="۱۴۰۵/۰۸/۰۵" id="editDate-${safeAttr(rid)}" value="${safeAttr(jalaliInputValue(r.date||''))}"></div>
+    <div><label>محل کار / مکان</label><input type="text" id="editPlace-${safeAttr(rid)}" value="${safeAttr(r.workplace||'')}" placeholder="مثلاً کارخانه، شعبه ۲"></div>
+    <div><label>ساعت ورود</label><input type="datetime-local" id="editIn-${safeAttr(rid)}" value="${safeAttr(localInputValue(r.in))}"></div>
+    <div><label>ساعت خروج</label><input type="datetime-local" id="editOut-${safeAttr(rid)}" value="${safeAttr(localInputValue(r.out))}"></div>
+  </div><button class="primary" onclick="editAttendance('${safeAttr(rid)}')" style="width:100%;margin-top:8px">ذخیره تغییرات این نوبت</button>`:''}
   ${r.notes?`<div style="margin-top:6px">${escapeHtml(r.notes)}</div>`:''}
-  <div style="text-align:left;margin-top:7px"><button class="danger" onclick="deleteRecord('${r.id}')" style="padding:6px 10px;font-size:12px">حذف</button></div></div>`;
+  <div style="text-align:left;margin-top:7px"><button class="danger" onclick="deleteRecord('${safeAttr(rid)}')" style="padding:6px 10px;font-size:12px">حذف</button></div></div>`;
  }).join(''):'<p class="note">برای این ماه هنوز موردی ثبت نشده است.</p>';
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function ensureRecord(date){let r=records.find(x=>x.date===date && (x.type==='attendance'||!x.type));if(!r){r={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type:'attendance'};records.push(r)}else if(!r.type)r.type='attendance';return r}
-$('inBtn').onclick=()=>{let r=ensureRecord(localDate());if(r.in){alert('ورود امروز قبلاً ثبت شده است.');return}r.in=new Date().toISOString();save();render()};
-$('outBtn').onclick=()=>{let r=ensureRecord(localDate());if(!r.in){alert('ابتدا ساعت ورود را ثبت کنید.');return}if(r.out){alert('خروج امروز قبلاً ثبت شده است.');return}r.out=new Date().toISOString();save();render()};
-$('saveExtra').onclick=()=>{const entered=$('recordDate').value.trim(),date=jalaliToISO(entered),type=$('kind').value,duration=Number($('duration').value)||0,notes=$('notes').value.trim();if(!date){alert('تاریخ شمسی را به شکل ۱۴۰۵/۰۸/۰۴ وارد کنید.');return}if(['leave','overtime'].includes(type)&&duration<=0){alert('مدت را به ساعت وارد کنید.');return}records.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type,duration,notes});save();$('duration').value='';$('notes').value='';// Backup / restore: export both records and app settings as a portable JSON file.
-$('backupExport').onclick=async()=>{
-  const payload={format:'saatzan-backup',version:1,createdAt:new Date().toISOString(),records,settings};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
-  const filename='saatzan-backup-'+localDate()+'.json';
-  const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download=filename;a.rel='noopener';a.style.display='none';
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),120000);
-  alert('درخواست ذخیره فایل پشتیبان انجام شد. پوشه دانلودها را بررسی کنید.');
-};
-$('backupImportBtn').onclick=()=>$('backupFile').click();
-$('backupFile').onchange=async(e)=>{
-  const file=e.target.files&&e.target.files[0];if(!file)return;
-  try{
-    const data=JSON.parse(await file.text());
-    if(!data||data.format!=='saatzan-backup'||!Array.isArray(data.records)||!data.settings||typeof data.settings!=='object')
-      throw new Error('ساختار فایل پشتیبان معتبر نیست.');
-    if(!confirm('اطلاعات فعلی با فایل پشتیبان جایگزین شود؟'))return;
-    records=data.records;
-    settings={requiredHours:8,workplaceName:'',biometricEnabled:false,...data.settings};
-    localStorage.setItem(storeKey,JSON.stringify(records));
-    localStorage.setItem(settingsKey,JSON.stringify(settings));
-    $('requiredHours').value=settings.requiredHours||8;
-    $('workplaceName').value=settings.workplaceName||'';
-    $('biometricEnabled').checked=!!settings.biometricEnabled;
-    render();updateClock();
-    alert('بازیابی اطلاعات با موفقیت انجام شد.');
-  }catch(err){alert('بازیابی انجام نشد: '+(err.message||String(err)));}
-  finally{$('backupFile').value='';}
-};
-$('recordDate').value=jalaliText(new Date());render()};
+function newId(){return crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random().toString(16).slice(2)}
+function openAttendance(date){return records.filter(r=>r.date===date&&isAttendance(r)&&r.in&&!r.out).sort((a,b)=>String(b.in).localeCompare(String(a.in)))[0]||null}
+$('inBtn').onclick=()=>{const date=localDate();if(openAttendance(date)){alert('برای نوبت قبلی هنوز خروج ثبت نشده است. ابتدا خروج را ثبت کنید.');return}const now=new Date();records.push({id:newId(),date,type:'attendance',in:now.toISOString(),out:'',workplace:settings.workplaceName||''});save();render()};
+$('outBtn').onclick=()=>{const date=localDate();const r=openAttendance(date);if(!r){alert('ورود باز برای امروز پیدا نشد. ابتدا «ثبت ورود» را بزنید.');return}r.out=new Date().toISOString();save();render()};
+window.editAttendance=id=>{const r=records.find(x=>String(x.id)===String(id));if(!r)return;const date=jalaliInputToISO($('editDate-'+id)?.value);const inValue=$('editIn-'+id)?.value||'';const outValue=$('editOut-'+id)?.value||'';const place=$('editPlace-'+id)?.value.trim()||'';if(!date){alert('تاریخ شمسی را به شکل سال/ماه/روز وارد کنید؛ مثال ۱۴۰۵/۰۸/۰۵.');return}const newIn=inputToISO(inValue),newOut=inputToISO(outValue);if(inValue&&!newIn){alert('ساعت ورود معتبر نیست.');return}if(outValue&&!newOut){alert('ساعت خروج معتبر نیست.');return}if(newIn&&newOut&&new Date(newOut)<new Date(newIn)){alert('ساعت خروج نمی‌تواند قبل از ساعت ورود باشد.');return}r.date=date;r.in=newIn;r.out=newOut;r.workplace=place;save();render();alert('تغییرات ذخیره شد.')};
+$('saveExtra').onclick=()=>{const entered=$('recordDate').value.trim(),date=jalaliToISO(entered),type=$('kind').value,duration=Number($('duration').value)||0,notes=$('notes').value.trim();if(!date){alert('تاریخ شمسی را به شکل ۱۴۰۵/۰۸/۰۴ وارد کنید.');return}if(['leave','overtime'].includes(type)&&duration<=0){alert('مدت را به ساعت وارد کنید.');return}records.push({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),date,type,duration,notes});save();$('duration').value='';$('notes').value='';$('recordDate').value=jalaliText(new Date());render()};
 $('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
 $('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));updateClock()};
 $('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').checked;if(typeof window.saatzanConfigureBiometric!=='function'){alert('برای اثر انگشت، نسخه اندروید جدید را نصب کنید. این قابلیت در مرورگر قابل فعال‌سازی نیست.');$('biometricEnabled').checked=!!settings.biometricEnabled;return;}const ok=await window.saatzanConfigureBiometric(desired);if(ok){settings.biometricEnabled=desired;localStorage.setItem(settingsKey,JSON.stringify(settings));}else{$('biometricEnabled').checked=!!settings.biometricEnabled;}};
-$('month').value=localMonth();$('month').onchange=render;$('refresh').onclick=render;window.deleteRecord=id=>{
-  if(confirm('این مورد حذف شود؟')){
-    records=records.filter(r=>r.id!==id);
-    save();
-    if(window.saatzanCloud)window.saatzanCloud.delete(id);
-    render();
-  }
-};window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
-$('exportCsv').onclick=()=>{
- const month=$('month').value||localMonth(), rows=[['تاریخ','ورود','خروج','کارکرد دقیقه','نوع ثبت','مدت ساعت','توضیحات']];
+window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
+$('exportCsv').onclick=async()=>{
+ const month=selectedJalaliMonth();
+ if(!/^\d{4}\/\d{1,2}$/.test(month)){alert('ماه را به شکل سال/ماه وارد کنید؛ مثال ۱۴۰۵/۰۸.');return;}
+ const rows=[['تاریخ شمسی','ساعت ورود','ساعت خروج','کارکرد (دقیقه)','نوع ثبت','مدت (ساعت)','مکان کاری','توضیحات']];
  const labels={attendance:'حضور و غیاب',leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
- records.filter(r=>r.date?.startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>rows.push([displayDate(r.date),r.in?new Date(r.in).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',r.out?new Date(r.out).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',duration(r),labels[r.type]||r.type,r.duration||'',r.notes||'']));
- const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
- const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`gozaresh-${month}.csv`;a.click();URL.revokeObjectURL(url);
+ records.filter(r=>recordMatchesJalaliMonth(r.date,month)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
+   rows.push([displayDate(r.date),r.in?new Date(r.in).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',r.out?new Date(r.out).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',duration(r),labels[r.type]||r.type,r.duration||'',r.workplace||'',r.notes||'']);
+ });
+ const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ const filename=`gozaresh-${month.replace('/','_')}.csv`;
+ try{
+   // In the Android app, prefer the native file/share plugins. Do not depend
+   // only on isNativePlatform(), which may be unavailable in some WebViews.
+   if(typeof window.saatzanExportFile === 'function'){
+     await window.saatzanExportFile(csv,filename);
+     if(rows.length===1) alert('فایل گزارش این ماه ساخته شد؛ برای این ماه رکوردی ثبت نشده است.');
+     return;
+   }
+   // Never silently fall back to a browser download inside the installed APK:
+   // that path can show a success message without creating a user-visible file.
+   const isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
+   if(isNative){
+     throw new Error('ماژول ذخیره فایل اندروید در این APK بارگذاری نشده است. لطفاً نسخه APK جدید را نصب کنید.');
+   }
+   // Browser fallback for a normal web browser.
+   if(typeof Blob === 'undefined' || !window.URL || typeof URL.createObjectURL !== 'function'){
+     throw new Error('دانلود فایل در این محیط پشتیبانی نمی‌شود و ماژول اندروید هم بارگذاری نشده است.');
+   }
+   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+   const url=URL.createObjectURL(blob);
+   const a=document.createElement('a');a.href=url;a.download=filename;a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),120000);
+   alert(rows.length===1?'فایل گزارش ساخته شد، اما برای این ماه رکوردی وجود ندارد.':'درخواست دانلود فایل ارسال شد. پوشه دانلودها را بررسی کنید.');
+ }catch(err){
+   console.error('CSV export failed',err);
+   alert('خروجی فایل انجام نشد: '+(err && err.message ? err.message : String(err))+'\nلطفاً مطمئن شوید APK از آخرین اجرای موفق GitHub Actions ساخته شده است.');
+ }
 };
+// Separate in-app views for home, history and backup.
+document.querySelectorAll('[data-view]').forEach(btn=>btn.onclick=()=>{
+ const view=btn.dataset.view;
+ $('historyPage').hidden=view!=='historyPage';
+ $('backupPage').hidden=view!=='backupPage';
+ document.querySelectorAll('main > section.card, main > .two').forEach(el=>{
+   if(el.id==='historyPage'||el.id==='backupPage')return;
+   el.hidden=view!=='home';
+ });
+});
+$('backupExport').onclick=async()=>{
+ try{
+  const payload={format:'saatzan-backup',version:1,createdAt:new Date().toISOString(),records,settings};
+  const content=JSON.stringify(payload,null,2);
+  const filename='saatzan-backup-'+localDate()+'.json';
+  if(typeof window.saatzanExportFile==='function'){
+    await window.saatzanExportFile(content,filename,'backup');
+    alert('فایل پشتیبان ساخته شد. از پنجره بازشده ذخیره یا اشتراک‌گذاری را انتخاب کنید.');
+    return;
+  }
+  if(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())
+    throw new Error('امکان ذخیره‌سازی در این نسخه اندروید بارگذاری نشده؛ APK جدید را نصب کنید.');
+  const blob=new Blob([content],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  alert('فایل پشتیبان آماده دانلود است.');
+ }catch(err){console.error(err);alert('پشتیبان‌گیری ناموفق بود: '+(err.message||String(err)));}
+};
+$('backupImportBtn').onclick=()=>$('backupFile').click();
+$('backupFile').onchange=async e=>{
+ const file=e.target.files&&e.target.files[0];if(!file)return;
+ try{
+  const data=JSON.parse(await file.text());
+  if(data.format!=='saatzan-backup'||!Array.isArray(data.records)||!data.settings)throw new Error('فایل انتخاب‌شده پشتیبان معتبر ساعت‌زن نیست.');
+  if(!confirm('اطلاعات فعلی با نسخه پشتیبان جایگزین شود؟'))return;
+  records=data.records;settings={requiredHours:8,workplaceName:'',biometricEnabled:false,...data.settings};
+  localStorage.setItem(storeKey,JSON.stringify(records));localStorage.setItem(settingsKey,JSON.stringify(settings));
+  $('requiredHours').value=settings.requiredHours||8;$('workplaceName').value=settings.workplaceName||'';$('biometricEnabled').checked=!!settings.biometricEnabled;
+  render();updateClock();alert('بازیابی انجام شد.');
+ }catch(err){alert('بازیابی ناموفق بود: '+(err.message||String(err)));}
+ finally{e.target.value='';}
+};
+$('month').value=jalaliText(new Date()).slice(0,7);
+$('month').addEventListener('change',render);
+$('month').addEventListener('input',()=>{if(/^\d{4}[\/.-]\d{1,2}$/.test(toLatinDigits($('month').value.trim())))render();});
+$('refresh').onclick=render;
 $('recordDate').value=jalaliText(new Date());render();updateClock();setInterval(updateClock,1000);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 <script src="biometric.bundle.js"></script>
+<script src="export.bundle.js"></script>
 </body>
 </html>
-<script src="cloud-sync.js"></script>
-<script src="biometric.bundle.js"></script>
-</body>
