@@ -23,10 +23,10 @@ window.saatzanExportFile = async function (content, filename) {
   // On Android, pass the file URI in `files` so the Sharesheet receives an
   // actual attachment that can be saved to Downloads or opened in Excel.
   await Share.share({
-    title: 'گزارش ماهانه ساعت‌زن من',
-    text: 'گزارش ماهانه ساعت‌زن من (CSV)',
+    title: 'فایل ساعت‌زن من',
+    text: 'فایل خروجی ساعت‌زن من',
     files: [result.uri],
-    dialogTitle: 'ذخیره یا ارسال گزارش ماهانه',
+    dialogTitle: 'ذخیره یا ارسال فایل',
   });
 
   return { uri: result.uri, filename: safeName };
