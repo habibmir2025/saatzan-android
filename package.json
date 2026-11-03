@@ -10,7 +10,8 @@
     "@capacitor/core": "^7.0.0",
     "@capacitor/filesystem": "^7.1.4",
     "@capacitor/share": "^7.0.2",
-    "@aparajita/capacitor-biometric-auth": "9.1.2"
+    "@aparajita/capacitor-biometric-auth": "9.1.2",
+    "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.0.0",
