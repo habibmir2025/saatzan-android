@@ -136,7 +136,7 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 <div class="metric"><small>مرخصی ساعتی</small><strong id="monthLeave">۰:۰۰</strong></div>
 <div class="metric"><small>روزهای ثبت‌شده</small><strong id="monthDays">۰</strong></div>
 </div>
-<button class="secondary" id="exportCsv" style="width:100%;margin-top:12px">خروجی اکسل (CSV)</button>
+<button class="secondary" id="exportCsv" style="width:100%;margin-top:12px">خروجی اکسل (XLSX)</button>
 <p class="note">فایل CSV با Excel باز می‌شود.</p>
 </section>
 <section class="card">
@@ -312,41 +312,49 @@ $('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').che
 window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
 $('exportCsv').onclick=async()=>{
  const month=selectedJalaliMonth();
- if(!/^\d{4}\/\d{1,2}$/.test(month)){alert('ماه را به شکل سال/ماه وارد کنید؛ مثال ۱۴۰۵/۰۸.');return;}
- const rows=[['تاریخ شمسی','ساعت ورود','ساعت خروج','کارکرد (دقیقه)','نوع ثبت','مدت (ساعت)','مکان کاری','توضیحات']];
- const labels={attendance:'حضور و غیاب',leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
- records.filter(r=>recordMatchesJalaliMonth(r.date,month)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
-   rows.push([displayDate(r.date),r.in?new Date(r.in).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',r.out?new Date(r.out).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'',duration(r),labels[r.type]||r.type,r.duration||'',r.workplace||'',r.notes||'']);
+ if(!/^\\d{4}\\/\\d{1,2}$/.test(month)){alert('ماه را به شکل سال/ماه وارد کنید؛ مثال ۱۴۰۵/۰۸.');return;}
+ const monthly=records.filter(r=>recordMatchesJalaliMonth(r.date,month)).sort((a,b)=>a.date.localeCompare(b.date));
+ const daily=new Map();
+ monthly.filter(isAttendance).forEach(r=>{
+  const key=r.date;
+  if(!daily.has(key))daily.set(key,{date:key,ins:[],outs:[],minutes:0});
+  const d=daily.get(key);d.minutes+=duration(r);
+  if(r.in)d.ins.push(r.in);if(r.out)d.outs.push(r.out);
  });
- const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
- const filename=`gozaresh-${month.replace('/','_')}.csv`;
+ const dateKeys=[...daily.keys()].sort();
+ const detail=[['تاریخ شمسی','اولین ورود','آخرین خروج','جمع کارکرد','ساعت موظفی','اضافه‌کاری','کم‌کاری','تعداد نوبت']];
+ let totalMinutes=0,totalOvertime=0,totalShort=0;
+ const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+ const toTime=iso=>iso?new Date(iso).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'';
+ dateKeys.forEach(date=>{
+  const d=daily.get(date),worked=d.minutes,regular=480,ot=Math.max(0,worked-regular),short=Math.max(0,regular-worked);
+  totalMinutes+=worked;totalOvertime+=ot;totalShort+=short;
+  const ins=d.ins.sort(),outs=d.outs.sort();
+  detail.push([displayDate(date),toTime(ins[0]),toTime(outs[outs.length-1]),fmt(worked),fmt(regular),fmt(ot),fmt(short),d.ins.length]);
+ });
+ detail.push(['جمع کل ماه','','',fmt(totalMinutes),fmt(dateKeys.length*480),fmt(totalOvertime),fmt(totalShort),dateKeys.length]);
+ const summary=[
+  ['خلاصه کارکرد ماهانه',month],
+  ['تعداد روزهای دارای ثبت',dateKeys.length],
+  ['جمع کل کارکرد (ساعت:دقیقه)',fmt(totalMinutes)],
+  ['جمع ساعت موظفی (۸ ساعت × روزهای دارای ثبت)',fmt(dateKeys.length*480)],
+  ['جمع کل اضافه‌کاری',fmt(totalOvertime)],
+  ['جمع کل کم‌کاری',fmt(totalShort)],
+  ['مبنای محاسبه','کارکرد هر روز منهای ۸ ساعت؛ اضافه‌کاری فقط مقدار مثبت است']
+ ];
+ const exportData={filename:`saatzan-${month.replace('/','-')}.xlsx`,sheets:[{name:'کارکرد روزانه',rows:detail},{name:'خلاصه ماه',rows:summary}]};
  try{
-   // In the Android app, prefer the native file/share plugins. Do not depend
-   // only on isNativePlatform(), which may be unavailable in some WebViews.
-   if(typeof window.saatzanExportFile === 'function'){
-     await window.saatzanExportFile(csv,filename);
-     if(rows.length===1) alert('فایل گزارش این ماه ساخته شد؛ برای این ماه رکوردی ثبت نشده است.');
-     return;
-   }
-   // Never silently fall back to a browser download inside the installed APK:
-   // that path can show a success message without creating a user-visible file.
-   const isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform());
-   if(isNative){
-     throw new Error('ماژول ذخیره فایل اندروید در این APK بارگذاری نشده است. لطفاً نسخه APK جدید را نصب کنید.');
-   }
-   // Browser fallback for a normal web browser.
-   if(typeof Blob === 'undefined' || !window.URL || typeof URL.createObjectURL !== 'function'){
-     throw new Error('دانلود فایل در این محیط پشتیبانی نمی‌شود و ماژول اندروید هم بارگذاری نشده است.');
-   }
-   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-   const url=URL.createObjectURL(blob);
-   const a=document.createElement('a');a.href=url;a.download=filename;a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
-   setTimeout(()=>URL.revokeObjectURL(url),120000);
-   alert(rows.length===1?'فایل گزارش ساخته شد، اما برای این ماه رکوردی وجود ندارد.':'درخواست دانلود فایل ارسال شد. پوشه دانلودها را بررسی کنید.');
- }catch(err){
-   console.error('CSV export failed',err);
-   alert('خروجی فایل انجام نشد: '+(err && err.message ? err.message : String(err))+'\nلطفاً مطمئن شوید APK از آخرین اجرای موفق GitHub Actions ساخته شده است.');
- }
+  if(typeof window.saatzanExportXlsx==='function'){await window.saatzanExportXlsx(exportData);return;}
+  const isNative=!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform());
+  if(isNative)throw new Error('ماژول خروجی اکسل در APK نصب‌شده نیست؛ APK جدید را نصب کنید.');
+  if(typeof window.saatzanCreateXlsx==='function'){
+    const base64=window.saatzanCreateXlsx(exportData);
+    const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));
+    const blob=new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=exportData.filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),120000);return;
+  }
+  throw new Error('کتابخانه ساخت فایل اکسل بارگذاری نشده است.');
+ }catch(err){console.error('XLSX export failed',err);alert('ساخت خروجی اکسل ناموفق بود: '+(err.message||String(err)));}
 };
 document.querySelectorAll('.nav-btn').forEach(btn=>btn.onclick=()=>{
  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b===btn));
