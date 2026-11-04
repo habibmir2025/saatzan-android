@@ -64,3 +64,23 @@ window.saatzanExportXlsx = async function(data) {
   });
   return {uri:file.uri,filename};
 };
+
+
+// Export a JSON backup through Android's native share/save sheet.
+window.saatzanExportFile = async function(content, filename) {
+  const safeName = String(filename || 'saatzan-backup.json').replace(/[\\/:*?"<>|]/g, '_');
+  const file = await Filesystem.writeFile({
+    path: safeName,
+    data: String(content),
+    directory: Directory.Cache,
+    recursive: true
+  });
+  if (!file || !file.uri) throw new Error('فایل پشتیبان در حافظه موقت ساخته نشد.');
+  await Share.share({
+    title: 'پشتیبان اطلاعات ساعت‌زن من',
+    text: 'فایل پشتیبان سوابق و تنظیمات برنامه',
+    files: [file.uri],
+    dialogTitle: 'ذخیره فایل پشتیبان'
+  });
+  return { uri: file.uri, filename: safeName };
+};
