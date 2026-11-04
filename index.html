@@ -312,7 +312,7 @@ $('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').che
 window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
 $('exportCsv').onclick=async()=>{
  const month=selectedJalaliMonth();
- if(!/^\\d{4}\\/\\d{1,2}$/.test(month)){alert('ماه را به شکل سال/ماه وارد کنید؛ مثال ۱۴۰۵/۰۸.');return;}
+ if(!/^\d{4}\/\d{1,2}$/.test(month)){alert('ماه را به شکل سال/ماه وارد کنید؛ مثال ۱۴۰۵/۰۸.');return;}
  const monthly=records.filter(r=>recordMatchesJalaliMonth(r.date,month)).sort((a,b)=>a.date.localeCompare(b.date));
  const daily=new Map();
  monthly.filter(isAttendance).forEach(r=>{
