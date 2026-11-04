@@ -211,7 +211,7 @@ function isoMonthToJalali(value){
  const m=String(value||'').match(/^(\d{4})-(\d{2})$/);if(!m)return jalaliText(new Date()).slice(0,7);
  const d=new Date(+m[1],+m[2]-1,15,12),q=jalaliParts(d);return `${faNum(q.y)}/${faNum(pad(q.m))}`;
 }
-function displayDate(iso){if(!iso)return '—';const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return faNum(iso);return jalaliText(new Date(+m[1],+m[2]-1,+m[3],12))}
+function displayDate(iso){if(!iso)return '—';const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return faNum(iso);const d=new Date(+m[1],+m[2]-1,+m[3],12);const weekday=new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(d);return `${weekday}، ${jalaliText(d)}`}
 function jalaliInputValue(iso){if(!iso)return '';const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return '';const d=new Date(+m[1],+m[2]-1,+m[3],12);const parts=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);const o={};parts.forEach(p=>{if(p.type!=='literal')o[p.type]=p.value});return `${o.year}/${String(o.month).padStart(2,'0')}/${String(o.day).padStart(2,'0')}`;}
 function jalaliInputToISO(value){const s=toLatinDigits(String(value||'').trim()).replace(/[.-]/g,'/');const m=s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);if(!m)return '';const jy=+m[1],jm=+m[2],jd=+m[3];if(jm<1||jm>12||jd<1||jd>31)return '';const target=`${jy}-${String(jm).padStart(2,'0')}-${String(jd).padStart(2,'0')}`;const fmt=new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit'});const start=new Date(jy+621,0,1,12);for(let delta=-120;delta<=400;delta++){const d=new Date(start);d.setDate(d.getDate()+delta);const ps=fmt.formatToParts(d);const o={};ps.forEach(p=>{if(p.type!=='literal')o[p.type]=p.value});if(+o.year===jy&&+o.month===jm&&+o.day===jd)return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;}return '';}
 function updateClock(){const now=new Date();const el=$('liveClock');if(el)el.textContent=faNum(`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);const de=$('todayDate');if(de)de.textContent=now.toLocaleDateString('fa-IR-u-ca-persian',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const wp=$('workplaceDisplay');if(wp)wp.textContent=settings.workplaceName?`📍 ${settings.workplaceName}`:'📍 مکان کاری تنظیم نشده';}
@@ -322,7 +322,7 @@ $('exportCsv').onclick=async()=>{
   if(r.in)d.ins.push(r.in);if(r.out)d.outs.push(r.out);
  });
  const dateKeys=[...daily.keys()].sort();
- const detail=[['تاریخ شمسی','اولین ورود','آخرین خروج','جمع کارکرد','ساعت موظفی','اضافه‌کاری','کم‌کاری','تعداد نوبت']];
+ const detail=[['روز هفته','تاریخ شمسی','اولین ورود','آخرین خروج','جمع کارکرد','ساعت موظفی','اضافه‌کاری','کم‌کاری','تعداد نوبت']];
  let totalMinutes=0,totalOvertime=0,totalShort=0;
  const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
  const toTime=iso=>iso?new Date(iso).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'';
@@ -330,9 +330,9 @@ $('exportCsv').onclick=async()=>{
   const d=daily.get(date),worked=d.minutes,regular=480,ot=Math.max(0,worked-regular),short=Math.max(0,regular-worked);
   totalMinutes+=worked;totalOvertime+=ot;totalShort+=short;
   const ins=d.ins.sort(),outs=d.outs.sort();
-  detail.push([displayDate(date),toTime(ins[0]),toTime(outs[outs.length-1]),fmt(worked),fmt(regular),fmt(ot),fmt(short),d.ins.length]);
+  detail.push([new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),jalaliText(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),toTime(ins[0]),toTime(outs[outs.length-1]),fmt(worked),fmt(regular),fmt(ot),fmt(short),d.ins.length]);
  });
- detail.push(['جمع کل ماه','','',fmt(totalMinutes),fmt(dateKeys.length*480),fmt(totalOvertime),fmt(totalShort),dateKeys.length]);
+ detail.push(['جمع کل ماه','','','',fmt(totalMinutes),fmt(dateKeys.length*480),fmt(totalOvertime),fmt(totalShort),dateKeys.length]);
  const summary=[
   ['خلاصه کارکرد ماهانه',month],
   ['تعداد روزهای دارای ثبت',dateKeys.length],
