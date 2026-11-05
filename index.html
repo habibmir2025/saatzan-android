@@ -364,12 +364,13 @@ $('exportCsv').onclick=async()=>{
  const daily=new Map();
  monthly.filter(isAttendance).forEach(r=>{
   const key=r.date;
-  if(!daily.has(key))daily.set(key,{date:key,ins:[],outs:[],minutes:0});
+  if(!daily.has(key))daily.set(key,{date:key,ins:[],outs:[],minutes:0,workplaces:[]});
   const d=daily.get(key);d.minutes+=duration(r);
   if(r.in)d.ins.push(r.in);if(r.out)d.outs.push(r.out);
+  const workplace=String(r.workplace||'').trim();if(workplace&&!d.workplaces.includes(workplace))d.workplaces.push(workplace);
  });
  const dateKeys=[...daily.keys()].sort();
- const detail=[['روز هفته','تاریخ شمسی','اولین ورود','آخرین خروج','جمع کارکرد','ساعت موظفی','اضافه‌کاری','کم‌کاری','تعداد نوبت']];
+ const detail=[['روز هفته','تاریخ شمسی','اولین ورود','آخرین خروج','محل کار','جمع کارکرد','ساعت موظفی','اضافه‌کاری','کم‌کاری','تعداد نوبت']];
  let totalMinutes=0,totalOvertime=0,totalShort=0;
  const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
  const requiredMinutes=(Number(settings.requiredHours)||8)*60;
@@ -378,9 +379,9 @@ $('exportCsv').onclick=async()=>{
   const d=daily.get(date),worked=d.minutes,regular=requiredMinutes,ot=Math.max(0,worked-regular),short=Math.max(0,regular-worked);
   totalMinutes+=worked;totalOvertime+=ot;totalShort+=short;
   const ins=d.ins.sort(),outs=d.outs.sort();
-  detail.push([new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),jalaliText(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),toTime(ins[0]),toTime(outs[outs.length-1]),fmt(worked),fmt(regular),fmt(ot),fmt(short),d.ins.length]);
+  detail.push([new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),jalaliText(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),toTime(ins[0]),toTime(outs[outs.length-1]),d.workplaces.join('، '),fmt(worked),fmt(regular),fmt(ot),fmt(short),d.ins.length]);
  });
- detail.push(['جمع کل ماه','','','',fmt(totalMinutes),fmt(dateKeys.length*requiredMinutes),fmt(totalOvertime),fmt(totalShort),dateKeys.length]);
+ detail.push(['جمع کل ماه','','','','',fmt(totalMinutes),fmt(dateKeys.length*requiredMinutes),fmt(totalOvertime),fmt(totalShort),dateKeys.length]);
  const summary=[
   ['خلاصه کارکرد ماهانه',month],
   ['تعداد روزهای دارای ثبت',dateKeys.length],
