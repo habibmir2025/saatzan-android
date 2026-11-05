@@ -84,3 +84,25 @@ window.saatzanExportFile = async function(content, filename) {
   });
   return { uri: file.uri, filename: safeName };
 };
+
+
+// Keep a private, persistent automatic backup on the device without opening a share dialog.
+window.saatzanAutoBackup = async function(payload) {
+  const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
+  const filename = 'saatzan-auto-backup.json';
+  const file = await Filesystem.writeFile({
+    path: filename, data: content, directory: Directory.Data, recursive: true
+  });
+  if (!file || !file.uri) throw new Error('ذخیره نسخه پشتیبان خودکار ناموفق بود.');
+  return file.uri;
+};
+
+window.saatzanRestoreAutoBackup = async function() {
+  try {
+    const file = await Filesystem.readFile({path:'saatzan-auto-backup.json', directory:Directory.Data});
+    const raw = typeof file.data === 'string' ? file.data : '';
+    const data = JSON.parse(raw);
+    if (!data || data.format !== 'saatzan-backup' || !Array.isArray(data.records) || !data.settings) return null;
+    return data;
+  } catch (_) { return null; }
+};
