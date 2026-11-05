@@ -65,44 +65,21 @@ window.saatzanExportXlsx = async function(data) {
   return {uri:file.uri,filename};
 };
 
-
-// Export a JSON backup through Android's native share/save sheet.
-window.saatzanExportFile = async function(content, filename) {
-  const safeName = String(filename || 'saatzan-backup.json').replace(/[\\/:*?"<>|]/g, '_');
-  const file = await Filesystem.writeFile({
-    path: safeName,
-    data: String(content),
-    directory: Directory.Cache,
-    recursive: true
-  });
-  if (!file || !file.uri) throw new Error('فایل پشتیبان در حافظه موقت ساخته نشد.');
-  await Share.share({
-    title: 'پشتیبان اطلاعات ساعت‌زن من',
-    text: 'فایل پشتیبان سوابق و تنظیمات برنامه',
-    files: [file.uri],
-    dialogTitle: 'ذخیره فایل پشتیبان'
-  });
-  return { uri: file.uri, filename: safeName };
-};
-
-
-// Keep a private, persistent automatic backup on the device without opening a share dialog.
+// Persistent private backup in the app's data directory.
+const AUTO_BACKUP_PATH = 'saatzan-auto-backup.json';
 window.saatzanAutoBackup = async function(payload) {
-  const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
-  const filename = 'saatzan-auto-backup.json';
-  const file = await Filesystem.writeFile({
-    path: filename, data: content, directory: Directory.Data, recursive: true
-  });
-  if (!file || !file.uri) throw new Error('ذخیره نسخه پشتیبان خودکار ناموفق بود.');
-  return file.uri;
+  const data = JSON.stringify(payload);
+  await Filesystem.writeFile({ path: AUTO_BACKUP_PATH, data, directory: Directory.Data, recursive: true });
+  return true;
 };
-
 window.saatzanRestoreAutoBackup = async function() {
   try {
-    const file = await Filesystem.readFile({path:'saatzan-auto-backup.json', directory:Directory.Data});
-    const raw = typeof file.data === 'string' ? file.data : '';
-    const data = JSON.parse(raw);
-    if (!data || data.format !== 'saatzan-backup' || !Array.isArray(data.records) || !data.settings) return null;
-    return data;
-  } catch (_) { return null; }
+    const result = await Filesystem.readFile({ path: AUTO_BACKUP_PATH, directory: Directory.Data });
+    const data = typeof result.data === 'string' ? result.data : '';
+    const payload = JSON.parse(data);
+    if (payload && payload.format === 'saatzan-backup' && Array.isArray(payload.records) && payload.settings && typeof payload.settings === 'object') return payload;
+  } catch (e) {
+    // No backup yet, or file is unavailable.
+  }
+  return null;
 };
