@@ -432,27 +432,35 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
 </script>
 <script src="biometric.bundle.js"></script>
 <script src="export.bundle.js"></script>
-
-// On app exit/background, take one more snapshot. Data is also backed up after every save.
-let autoBackupExitBusy=false;
-async function backupOnExit(){
- if(autoBackupExitBusy)return;autoBackupExitBusy=true;
- const payload={format:'saatzan-backup',version:1,createdAt:new Date().toISOString(),records,settings};
- try{localStorage.setItem('saatzan_last_auto_backup_v1',JSON.stringify(payload));}catch(_){}
- try{if(typeof window.saatzanAutoBackup==='function')await window.saatzanAutoBackup(payload);}catch(e){console.warn('exit backup failed',e);}
- autoBackupExitBusy=false;
+<script>
+// Backup on background/exit. A durable copy is also written after each save.
+let autoBackupExitBusy = false;
+async function backupOnExit() {
+  if (autoBackupExitBusy) return;
+  autoBackupExitBusy = true;
+  const payload = {format:'saatzan-backup', version:1, createdAt:new Date().toISOString(), records, settings};
+  try { localStorage.setItem('saatzan_last_auto_backup_v1', JSON.stringify(payload)); } catch (_) {}
+  try { if (typeof window.saatzanAutoBackup === 'function') await window.saatzanAutoBackup(payload); }
+  catch (e) { console.warn('exit backup failed', e); }
+  autoBackupExitBusy = false;
 }
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')backupOnExit();});
-window.addEventListener('pagehide',backupOnExit);
-window.addEventListener('beforeunload',backupOnExit);
-(async()=>{
- if(records.length||typeof window.saatzanRestoreAutoBackup!=='function')return;
- const data=await window.saatzanRestoreAutoBackup();
- if(data){records=data.records;settings={requiredHours:8,annualLeaveDays:26,workplaceName:'',biometricEnabled:false,...data.settings};
-  try{localStorage.setItem(storeKey,JSON.stringify(records));localStorage.setItem(settingsKey,JSON.stringify(settings));}catch(_){}
-  render();updateClock();
- }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') backupOnExit(); });
+window.addEventListener('pagehide', backupOnExit);
+// Restore only when the primary local records are empty.
+(async () => {
+  if (records.length || typeof window.saatzanRestoreAutoBackup !== 'function') return;
+  try {
+    const data = await window.saatzanRestoreAutoBackup();
+    if (data && Array.isArray(data.records)) {
+      records = data.records;
+      settings = {requiredHours:8, annualLeaveDays:26, workplaceName:'', biometricEnabled:false, ...data.settings};
+      localStorage.setItem(storeKey, JSON.stringify(records));
+      localStorage.setItem(settingsKey, JSON.stringify(settings));
+      render(); updateClock();
+    }
+  } catch (e) { console.warn('auto restore failed', e); }
 })();
+</script>
 
 </body>
 </html>
