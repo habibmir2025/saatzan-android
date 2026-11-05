@@ -261,16 +261,10 @@ function jalaliInputToISO(value){const s=toLatinDigits(String(value||'').trim())
 function updateClock(){const now=new Date();const el=$('liveClock');if(el)el.textContent=faNum(`${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);const de=$('todayDate');if(de)de.textContent=now.toLocaleDateString('fa-IR-u-ca-persian',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const wp=$('workplaceDisplay');if(wp)wp.textContent=settings.workplaceName?`📍 ${settings.workplaceName}`:'📍 مکان کاری تنظیم نشده';}
 function time(d){return d?new Date(d).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit',hour12:false}):'—'}
 function fmtHours(mins){mins=Math.max(0,Math.round(mins||0));return `${faNum(Math.floor(mins/60))}:${faNum(pad(mins%60))}`}
-function automaticBackup(){
- const payload={format:'saatzan-backup',version:1,createdAt:new Date().toISOString(),records,settings};
- try{localStorage.setItem('saatzan_last_auto_backup_v1',JSON.stringify(payload));}catch(e){console.warn('local auto backup failed',e);}
- if(typeof window.saatzanAutoBackup==='function') window.saatzanAutoBackup(payload).catch(e=>console.warn('device auto backup failed',e));
-}
 function save(){
  const payload=JSON.stringify(records);
  try{localStorage.setItem(storeKey,payload);}catch(e){console.warn('localStorage save failed',e);}
  try{const req=indexedDB.open('saatzan_local_db',1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('appdata'))db.createObjectStore('appdata')};req.onsuccess=()=>{const db=req.result;try{const tx=db.transaction('appdata','readwrite');tx.objectStore('appdata').put(payload,storeKey);tx.oncomplete=()=>db.close();tx.onerror=()=>db.close();}catch(e){db.close();}};}catch(e){console.warn('IndexedDB backup failed',e);}
- automaticBackup();
 }
 function isAttendance(r){return r && (r.type==='attendance'||!r.type) && (r.in||r.out)}
 function todayAttendance(){return records.filter(r=>r.date===localDate()&&isAttendance(r)).sort((a,b)=>String(b.in||b.out||'').localeCompare(String(a.in||a.out||'')))}
@@ -346,11 +340,13 @@ $('backupImportBtn').onclick=()=>$('backupFile').click();
 $('backupFile').onchange=async(e)=>{
  const file=e.target.files&&e.target.files[0];if(!file)return;
  try{
-  const data=JSON.parse(await file.text());
+  const rawText=await file.text();
+  if(rawText.includes('\uFFFD'))throw new Error('محتوای فایل پشتیبان به‌درستی با UTF-8 ذخیره نشده است. از نسخه جدید برنامه یک پشتیبان تازه تهیه کنید.');
+  const data=JSON.parse(rawText.replace(/^\uFEFF/, '').trim());
   if(!data||data.format!=='saatzan-backup'||!Array.isArray(data.records)||!data.settings||typeof data.settings!=='object')throw new Error('ساختار فایل پشتیبان معتبر نیست.');
   if(!confirm('اطلاعات فعلی با فایل پشتیبان جایگزین شود؟'))return;
   records=data.records;settings={requiredHours:8,annualLeaveDays:26,workplaceName:'',biometricEnabled:false,...data.settings};
-  localStorage.setItem(storeKey,JSON.stringify(records));localStorage.setItem(settingsKey,JSON.stringify(settings));automaticBackup();
+  localStorage.setItem(storeKey,JSON.stringify(records));localStorage.setItem(settingsKey,JSON.stringify(settings));
   $('requiredHours').value=settings.requiredHours||8;$('annualLeaveDays').value=settings.annualLeaveDays??26;$('workplaceName').value=settings.workplaceName||'';$('biometricEnabled').checked=!!settings.biometricEnabled;
   render();updateClock();alert('بازیابی اطلاعات انجام شد.');
  }catch(err){alert('بازیابی انجام نشد: '+(err.message||String(err)));}
@@ -358,10 +354,10 @@ $('backupFile').onchange=async(e)=>{
 };
 $('kind').addEventListener('change',()=>{const daily=$('kind').value==='leave_daily';$('durationLabel').textContent=daily?'مدت (روز)':'مدت (ساعت)';$('duration').max=daily?'31':'24';$('duration').step=daily?'0.5':'0.25';$('duration').placeholder=daily?'مثلاً ۱':'مثلاً ۱٫۵';});
 
-$('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));automaticBackup();render()};
-$('annualLeaveDays').onchange=()=>{settings.annualLeaveDays=Math.max(0,Number($('annualLeaveDays').value)||0);localStorage.setItem(settingsKey,JSON.stringify(settings));automaticBackup();render()};
-$('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));automaticBackup();updateClock()};
-$('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').checked;if(typeof window.saatzanConfigureBiometric!=='function'){alert('برای اثر انگشت، نسخه اندروید جدید را نصب کنید. این قابلیت در مرورگر قابل فعال‌سازی نیست.');$('biometricEnabled').checked=!!settings.biometricEnabled;return;}const ok=await window.saatzanConfigureBiometric(desired);if(ok){settings.biometricEnabled=desired;localStorage.setItem(settingsKey,JSON.stringify(settings));automaticBackup();}else{$('biometricEnabled').checked=!!settings.biometricEnabled;}};
+$('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
+$('annualLeaveDays').onchange=()=>{settings.annualLeaveDays=Math.max(0,Number($('annualLeaveDays').value)||0);localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
+$('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));updateClock()};
+$('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').checked;if(typeof window.saatzanConfigureBiometric!=='function'){alert('برای اثر انگشت، نسخه اندروید جدید را نصب کنید. این قابلیت در مرورگر قابل فعال‌سازی نیست.');$('biometricEnabled').checked=!!settings.biometricEnabled;return;}const ok=await window.saatzanConfigureBiometric(desired);if(ok){settings.biometricEnabled=desired;localStorage.setItem(settingsKey,JSON.stringify(settings));}else{$('biometricEnabled').checked=!!settings.biometricEnabled;}};
 window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
 $('exportCsv').onclick=async()=>{
  const month=selectedJalaliMonth();
@@ -432,35 +428,5 @@ if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.ser
 </script>
 <script src="biometric.bundle.js"></script>
 <script src="export.bundle.js"></script>
-<script>
-// Backup on background/exit. A durable copy is also written after each save.
-let autoBackupExitBusy = false;
-async function backupOnExit() {
-  if (autoBackupExitBusy) return;
-  autoBackupExitBusy = true;
-  const payload = {format:'saatzan-backup', version:1, createdAt:new Date().toISOString(), records, settings};
-  try { localStorage.setItem('saatzan_last_auto_backup_v1', JSON.stringify(payload)); } catch (_) {}
-  try { if (typeof window.saatzanAutoBackup === 'function') await window.saatzanAutoBackup(payload); }
-  catch (e) { console.warn('exit backup failed', e); }
-  autoBackupExitBusy = false;
-}
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') backupOnExit(); });
-window.addEventListener('pagehide', backupOnExit);
-// Restore only when the primary local records are empty.
-(async () => {
-  if (records.length || typeof window.saatzanRestoreAutoBackup !== 'function') return;
-  try {
-    const data = await window.saatzanRestoreAutoBackup();
-    if (data && Array.isArray(data.records)) {
-      records = data.records;
-      settings = {requiredHours:8, annualLeaveDays:26, workplaceName:'', biometricEnabled:false, ...data.settings};
-      localStorage.setItem(storeKey, JSON.stringify(records));
-      localStorage.setItem(settingsKey, JSON.stringify(settings));
-      render(); updateClock();
-    }
-  } catch (e) { console.warn('auto restore failed', e); }
-})();
-</script>
-
 </body>
 </html>
