@@ -13,8 +13,6 @@ try {
 } catch (_) {}
 </script>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>ساعت‌زن من</title>
 <style>
 :root{font-family:Tahoma,Arial,sans-serif;color:#172554;background:#f3f7ff}
@@ -25,7 +23,7 @@ main{max-width:720px;margin:auto;padding:14px}
 .clock{text-align:center;font-size:30px;font-weight:bold;margin:12px 0 4px;direction:ltr;font-variant-numeric:tabular-nums}.clock-info{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}.workplace-badge{font-size:13px;background:#ffffff20;border:1px solid #ffffff35;border-radius:999px;padding:7px 10px;max-width:100%;overflow-wrap:anywhere}.biometric-lock{display:none;position:fixed;inset:0;z-index:9999;background:#f3f7ff;align-items:center;justify-content:center;padding:24px;text-align:center}.biometric-lock .lock-card{max-width:420px;width:100%;background:white;border-radius:20px;padding:28px;box-shadow:0 8px 30px #0002}.biometric-lock button{margin-top:12px;width:100%}.biometric-required #biometricLock{display:flex}
 .date{text-align:center;color:#64748b;font-size:13px}
 .status{text-align:center;margin:10px auto 14px;color:#164e8a;font-weight:bold}
-.page-nav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:10px 0 14px}.nav-btn{padding:10px 4px;font-size:12px}.nav-btn.active{background:#164e8a;color:#fff}.page-panel[hidden]{display:none}\n.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.page-nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:10px 0 14px}.nav-btn{padding:10px 4px;font-size:12px}.nav-btn.active{background:#164e8a;color:#fff}.page-panel[hidden]{display:none}\n.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 button,.btn{border:0;border-radius:12px;padding:13px 10px;font:inherit;font-weight:bold;cursor:pointer}
 .primary{background:#2563eb;color:white}.secondary{background:#dbeafe;color:#164e8a}.danger{background:#fee2e2;color:#991b1b}
 label{display:block;font-size:13px;margin:10px 0 6px;color:#3f4b42}
@@ -40,7 +38,7 @@ h2{font-size:17px;margin:0 0 10px}
 .entry:first-child{border-top:0}.muted{font-size:12px;color:#66736a}
 .pill{display:inline-block;background:#dbeafe;color:#2563eb;border-radius:30px;padding:4px 8px;font-size:12px}
 table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:8px 5px;border-bottom:1px solid #e8eee9;text-align:right}
-.tablewrap{overflow:auto}\n.jalali-picker{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;margin:6px 0 12px}.jalali-picker.month-only{grid-template-columns:1.2fr 1fr}.jalali-picker select{min-width:0;padding:11px 7px}
+.tablewrap{overflow:auto}
 .note{font-size:12px;color:#64748b;line-height:1.8}
 footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 @media(min-width:600px){.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
@@ -80,6 +78,7 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 <button class="secondary nav-btn active" data-page="homePage">خانه</button>
 <button class="secondary nav-btn" data-page="historyPage">سوابق</button>
 <button class="secondary nav-btn" data-page="leavePage">مرخصی</button>
+<button class="secondary nav-btn" data-page="overtimePage">اضافه‌کاری</button>
 <button class="secondary nav-btn" data-page="settingsPage">تنظیمات</button>
 <button class="secondary nav-btn" data-page="backupPage">پشتیبان</button>
 </nav>
@@ -100,7 +99,7 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 <section class="card">
 <h2>ثبت دستی ساعت روزهای گذشته</h2>
 <p class="note">تاریخ را شمسی وارد کنید. این ثبت به سوابق اضافه می‌شود و در فایل خروجی نیز می‌آید.</p>
-<label>انتخاب تاریخ شمسی</label><input id="manualDate" type="hidden"><div class="jalali-picker" id="manualDatePicker"></div>
+<label for="manualDate">تاریخ شمسی</label><input id="manualDate" inputmode="numeric" placeholder="۱۴۰۵/۰۸/۰۴">
 <div class="grid">
 <div><label for="manualIn">ساعت ورود</label><input id="manualIn" type="time"></div>
 <div><label for="manualOut">ساعت خروج</label><input id="manualOut" type="time"></div>
@@ -111,12 +110,22 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 <div id="leavePage" class="page-panel" hidden>
 <section class="card">
 <h2>ثبت مرخصی، اضافه‌کاری یا مأموریت</h2>
-<label>انتخاب تاریخ شمسی مرخصی یا ثبت</label><input type="hidden" id="recordDate"><div class="jalali-picker" id="recordDatePicker"></div>
+<label for="recordDate">تاریخ شمسی (سال/ماه/روز)</label><input type="text" id="recordDate" inputmode="numeric" placeholder="۱۴۰۵/۰۸/۰۴" autocomplete="off">
 <label for="kind">نوع ثبت</label>
-<select id="kind"><option value="leave">مرخصی ساعتی</option><option value="leave_daily">مرخصی روزانه</option><option value="overtime">اضافه‌کاری دستی</option><option value="mission">مأموریت</option><option value="absence">غیبت</option></select>
-<label for="duration" id="durationLabel">مدت (ساعت)</label><input type="number" id="duration" min="0.25" max="24" step="0.25" placeholder="مثلاً ۱٫۵">
+<select id="kind"><option value="leave">مرخصی ساعتی</option><option value="mission">مأموریت</option><option value="absence">غیبت</option></select>
+<label for="duration">مدت (ساعت)</label><input type="number" id="duration" min="0.25" max="24" step="0.25" placeholder="مثلاً ۱٫۵">
 <label for="notes">توضیحات</label><textarea id="notes" placeholder="توضیحات این روز..."></textarea>
 <button class="primary" id="saveExtra" style="width:100%;margin-top:12px">ذخیره ثبت</button>
+</section>
+</div>
+<div id="overtimePage" class="page-panel" hidden>
+<section class="card">
+<h2>ثبت اضافه‌کاری دستی</h2>
+<p class="note">اضافه‌کاری را جداگانه برای همان تاریخ ثبت کنید. مدت آن در جمع اضافه‌کاری روزانه و گزارش ماهانه محاسبه می‌شود.</p>
+<label for="manualOTDate">تاریخ شمسی</label><input id="manualOTDate" inputmode="numeric" placeholder="۱۴۰۵/۰۸/۰۴" autocomplete="off">
+<label for="manualOTDuration">مدت اضافه‌کاری (ساعت)</label><input type="number" id="manualOTDuration" min="0.25" max="24" step="0.25" placeholder="مثلاً ۲٫۵">
+<label for="manualOTNotes">توضیحات اضافه‌کاری</label><textarea id="manualOTNotes" placeholder="شرح کار یا علت اضافه‌کاری..."></textarea>
+<button class="primary" id="manualOTSave" style="width:100%;margin-top:12px">ثبت اضافه‌کاری</button>
 </section>
 </div>
 <div id="settingsPage" class="page-panel" hidden>
@@ -124,8 +133,6 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 <h2>تنظیمات کارکرد</h2>
 <label for="workplaceName">نام مکان کاری (کنار ساعت نمایش داده می‌شود)</label><input type="text" id="workplaceName" maxlength="80" placeholder="مثلاً کارخانه، سالن تعمیرات">
 <label for="requiredHours">ساعت کار موظفی روزانه</label><input type="number" id="requiredHours" min="1" max="24" step="0.5" value="8">
-<label for="annualLeaveDays">سهمیه مرخصی استحقاقی سالانه (روز)</label><input type="number" id="annualLeaveDays" min="0" max="365" step="0.5" value="26">
-<p class="note">سهمیه سالانه قابل تغییر است؛ هر روز مرخصی معادل ساعت موظفی روزانه محاسبه می‌شود.</p>
 <label style="display:flex;align-items:center;gap:10px;margin-top:14px"><input type="checkbox" id="biometricEnabled" style="width:20px;height:20px"> باز شدن برنامه با اثر انگشت / قفل گوشی</label>
 <p class="note">قفل اثر انگشت فقط در نسخه نصب‌شده اندروید و با ثبت اثر انگشت یا قفل صفحه در تنظیمات گوشی کار می‌کند.</p>
 </section>
@@ -133,12 +140,11 @@ footer{text-align:center;color:#748078;font-size:11px;padding:18px}
 <div id="historyPage" class="page-panel" hidden>
 <section class="card">
 <h2>خروجی و گزارش سوابق</h2>
-<label>انتخاب ماه گزارش (شمسی)</label><input type="hidden" id="month"><div class="jalali-picker month-only" id="monthPicker"></div>
+<label for="month">گزارش ماهانه (شمسی: سال/ماه)</label><input type="text" id="month" inputmode="numeric" placeholder="۱۴۰۵/۰۸" autocomplete="off">
 <div class="grid" style="margin-top:12px">
 <div class="metric"><small>مجموع کارکرد</small><strong id="monthHours">۰:۰۰</strong></div>
 <div class="metric"><small>مجموع اضافه‌کاری</small><strong id="monthOvertime">۰:۰۰</strong></div>
 <div class="metric"><small>مرخصی ساعتی</small><strong id="monthLeave">۰:۰۰</strong></div>
-<div class="metric"><small>مرخصی روزانه</small><strong id="monthLeaveDays">۰</strong></div>
 <div class="metric"><small>روزهای ثبت‌شده</small><strong id="monthDays">۰</strong></div>
 </div>
 <button class="secondary" id="exportCsv" style="width:100%;margin-top:12px">خروجی اکسل (XLSX)</button>
@@ -172,9 +178,8 @@ if(!records.length && 'indexedDB' in window){
  try{const req=indexedDB.open('saatzan_local_db',1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('appdata'))db.createObjectStore('appdata')};req.onsuccess=()=>{const db=req.result;try{const get=db.transaction('appdata','readonly').objectStore('appdata').get(storeKey);get.onsuccess=()=>{if(get.result){try{const restored=JSON.parse(get.result);if(Array.isArray(restored)&&restored.length){records=restored;localStorage.setItem(storeKey,JSON.stringify(records));render();}}catch(_){}}db.close();};get.onerror=()=>db.close();}catch(e){db.close();}};}catch(e){console.warn('IndexedDB restore failed',e);}
 }
 let settings = JSON.parse(localStorage.getItem(settingsKey) || '{"requiredHours":8}');
-settings = {requiredHours:8, annualLeaveDays:26, workplaceName:'', biometricEnabled:false, ...settings};
+settings = {requiredHours:8, workplaceName:'', biometricEnabled:false, ...settings};
 $('requiredHours').value = settings.requiredHours || 8;
-$('annualLeaveDays').value = settings.annualLeaveDays ?? 26;
 $('workplaceName').value = settings.workplaceName || '';
 $('biometricEnabled').checked = !!settings.biometricEnabled;
 const pad = n => String(n).padStart(2,'0');
@@ -193,44 +198,6 @@ function jalaliToISO(value){
  const start=new Date(jy+621,2,1,12),end=new Date(jy+623,3,1,12);
  for(let d=new Date(start);d<end;d.setDate(d.getDate()+1)){const p=jalaliParts(d);if(p.y===jy&&p.m===jm&&p.d===jd)return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
  return null;
-}
-
-function createJalaliPicker(inputId,containerId,monthOnly=false){
- const input=$(inputId),container=$(containerId);
- const current=jalaliParts(new Date());
- const year=document.createElement('select'),month=document.createElement('select'),day=document.createElement('select');
- const add=(el,value,label)=>{const o=document.createElement('option');o.value=value;o.textContent=label;el.appendChild(o)};
- for(let y=Math.max(1300,current.y-10);y<=current.y+15;y++)add(year,String(y),faNum(y));
- for(let m=1;m<=12;m++)add(month,String(m),faNum(m).padStart(2,'۰'));
- if(!monthOnly)for(let d=1;d<=31;d++)add(day,String(d),faNum(d));
- year.setAttribute('aria-label','سال شمسی');month.setAttribute('aria-label','ماه شمسی');day.setAttribute('aria-label','روز شمسی');
- container.append(year,month);if(!monthOnly)container.append(day);
- function updateDays(){
-  if(monthOnly)return;
-  const y=Number(year.value),m=Number(month.value),old=Number(day.value)||1;
-  let max=31;
-  while(max>0&&!jalaliToISO(`${y}/${m}/${max}`))max--;
-  day.innerHTML='';
-  for(let d=1;d<=max;d++)add(day,String(d),faNum(d));
-  day.value=String(Math.min(old,max));
- }
- function sync(){
-  updateDays();
-  const value=`${year.value}/${String(month.value).padStart(2,'0')}`+(monthOnly?'':`/${String(day.value).padStart(2,'0')}`);
-  input.value=value;
-  input.dispatchEvent(new Event('change',{bubbles:true}));
-  input.dispatchEvent(new Event('input',{bubbles:true}));
- }
- function load(value){
-  const parts=toLatinDigits(value||'').split('/');
-  year.value=parts[0]||String(current.y);month.value=String(Number(parts[1])||current.m);
-  updateDays();
-  if(!monthOnly)day.value=String(Number(parts[2])||current.d);
-  sync();
- }
- year.addEventListener('change',sync);month.addEventListener('change',sync);if(!monthOnly)day.addEventListener('change',sync);
- load(monthOnly?`${current.y}/${current.m}`:`${current.y}/${current.m}/${current.d}`);
- return {set:load};
 }
 function jalaliMonthToISO(value){
  const s=toLatinDigits(String(value||'').trim()).replace(/[.-]/g,'/');
@@ -286,15 +253,22 @@ function render(){
  const worked=monthRecords.reduce((s,r)=>s+duration(r),0);
  const overtime=monthRecords.reduce((s,r)=>s+Math.max(0,duration(r)-required)+ (r.type==='overtime'?(Number(r.duration)||0)*60:0),0);
  const leave=monthRecords.filter(r=>r.type==='leave').reduce((s,r)=>s+(Number(r.duration)||0)*60,0);
- const leaveDays=monthRecords.filter(r=>r.type==='leave_daily').reduce((s,r)=>s+(Number(r.duration)||0),0);
- $('monthHours').textContent=fmtHours(worked); $('monthOvertime').textContent=fmtHours(overtime); $('monthLeave').textContent=fmtHours(leave); $('monthLeaveDays').textContent=faNum(leaveDays);
+ $('monthHours').textContent=fmtHours(worked); $('monthOvertime').textContent=fmtHours(overtime); $('monthLeave').textContent=fmtHours(leave);
  $('monthDays').textContent=faNum(new Set(monthRecords.filter(r=>r.in||r.out).map(r=>r.date)).size);
  const list=monthRecords.slice().sort((a,b)=>b.date.localeCompare(a.date));
- $('entries').innerHTML=list.length?list.map(r=>{
-  const labels={leave:'مرخصی ساعتی',leave_daily:'مرخصی روزانه',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
+ const manualOTByDate=new Map();
+ monthRecords.filter(r=>r.type==='overtime').forEach(r=>{if(!manualOTByDate.has(r.date))manualOTByDate.set(r.date,[]);manualOTByDate.get(r.date).push(r);});
+ const shownOTDates=new Set();
+ $('entries').innerHTML=list.length?list.filter(r=>!(r.type==='overtime'&&monthRecords.some(a=>a.date===r.date&&isAttendance(a)))).map(r=>{
+  const labels={leave:'مرخصی ساعتی',overtime:'اضافه‌کاری دستی',mission:'مأموریت',absence:'غیبت'};
   const rid=String(r.id);
+  const dailyOT=manualOTByDate.get(r.date)||[];
+  const showDailyOT=isAttendance(r)&&dailyOT.length&&!shownOTDates.has(r.date);
+  if(showDailyOT)shownOTDates.add(r.date);
+  const manualOTCell=showDailyOT?`<div class="metric" style="margin-top:10px;background:#eff6ff"><strong style="font-size:14px">اضافه‌کاری دستی همان تاریخ: ${fmtHours(dailyOT.reduce((sum,x)=>sum+(Number(x.duration)||0)*60,0))}</strong>${dailyOT.map(x=>`<div class="muted" style="margin-top:5px">${escapeHtml(x.notes||'بدون توضیحات')}</div>`).join('')}</div>`:'';
   return `<div class="entry"><div class="row"><strong>${displayDate(r.date||'')}</strong><span class="pill">${labels[r.type]||'حضور و غیاب'}</span></div>
-  <div class="muted" style="margin:6px 0">کارکرد این نوبت: ${fmtHours(duration(r))}${r.duration?` | مدت ثبت: ${faNum(r.duration)} ${r.type==='leave_daily'?'روز':'ساعت'}`:''}</div>
+  <div class="muted" style="margin:6px 0">کارکرد این نوبت: ${fmtHours(duration(r))}${r.duration?` | مدت ثبت: ${faNum(r.duration)} ساعت`:''}</div>
+  ${manualOTCell}
   ${isAttendance(r)?`<div class="grid" style="margin-top:8px">
     <div><label>تاریخ شمسی (سال/ماه/روز)</label><input type="text" inputmode="numeric" placeholder="۱۴۰۵/۰۸/۰۵" id="editDate-${safeAttr(rid)}" value="${safeAttr(jalaliInputValue(r.date||''))}"></div>
     <div><label>محل کار / مکان</label><input type="text" id="editPlace-${safeAttr(rid)}" value="${safeAttr(r.workplace||'')}" placeholder="مثلاً کارخانه، شعبه ۲"></div>
@@ -314,8 +288,21 @@ window.editAttendance=id=>{const r=records.find(x=>String(x.id)===String(id));if
 $('saveExtra').onclick=()=>{
  const entered=$('recordDate').value.trim(),date=jalaliToISO(entered),type=$('kind').value,duration=Number($('duration').value)||0,notes=$('notes').value.trim();
  if(!date){alert('تاریخ شمسی را به شکل ۱۴۰۵/۰۸/۰۴ وارد کنید.');return}
- if(['leave','overtime','leave_daily'].includes(type)&&duration<=0){alert(type==='leave_daily'?'تعداد روز مرخصی را وارد کنید.':'مدت را به ساعت وارد کنید.');return}
+ if(['leave','overtime'].includes(type)&&duration<=0){alert('مدت را به ساعت وارد کنید.');return}
  records.push({id:newId(),date,type,duration,notes});save();$('duration').value='';$('notes').value='';render();
+};
+$('manualOTDate').value=jalaliText(new Date());
+$('manualOTSave').onclick=()=>{
+ const date=jalaliToISO($('manualOTDate').value.trim());
+ const duration=Number($('manualOTDuration').value)||0;
+ const notes=$('manualOTNotes').value.trim();
+ if(!date){alert('تاریخ شمسی معتبر وارد کنید؛ مثال ۱۴۰۵/۰۸/۰۴.');return;}
+ if(duration<=0||duration>24){alert('مدت اضافه‌کاری را بین ۰٫۲۵ تا ۲۴ ساعت وارد کنید.');return;}
+ records.push({id:newId(),date,type:'overtime',duration,notes,manual:true});
+ save();
+ $('manualOTDuration').value='';$('manualOTNotes').value='';
+ render();
+ alert('اضافه‌کاری دستی ثبت شد و در جمع ساعات محاسبه می‌شود.');
 };
 $('manualAttendanceSave').onclick=()=>{
  const date=jalaliToISO($('manualDate').value.trim()),iv=$('manualIn').value,ov=$('manualOut').value;
@@ -340,22 +327,18 @@ $('backupImportBtn').onclick=()=>$('backupFile').click();
 $('backupFile').onchange=async(e)=>{
  const file=e.target.files&&e.target.files[0];if(!file)return;
  try{
-  const rawText=await file.text();
-  if(rawText.includes('\uFFFD'))throw new Error('محتوای فایل پشتیبان به‌درستی با UTF-8 ذخیره نشده است. از نسخه جدید برنامه یک پشتیبان تازه تهیه کنید.');
-  const data=JSON.parse(rawText.replace(/^\uFEFF/, '').trim());
+  const data=JSON.parse(await file.text());
   if(!data||data.format!=='saatzan-backup'||!Array.isArray(data.records)||!data.settings||typeof data.settings!=='object')throw new Error('ساختار فایل پشتیبان معتبر نیست.');
   if(!confirm('اطلاعات فعلی با فایل پشتیبان جایگزین شود؟'))return;
-  records=data.records;settings={requiredHours:8,annualLeaveDays:26,workplaceName:'',biometricEnabled:false,...data.settings};
+  records=data.records;settings={requiredHours:8,workplaceName:'',biometricEnabled:false,...data.settings};
   localStorage.setItem(storeKey,JSON.stringify(records));localStorage.setItem(settingsKey,JSON.stringify(settings));
-  $('requiredHours').value=settings.requiredHours||8;$('annualLeaveDays').value=settings.annualLeaveDays??26;$('workplaceName').value=settings.workplaceName||'';$('biometricEnabled').checked=!!settings.biometricEnabled;
+  $('requiredHours').value=settings.requiredHours||8;$('workplaceName').value=settings.workplaceName||'';$('biometricEnabled').checked=!!settings.biometricEnabled;
   render();updateClock();alert('بازیابی اطلاعات انجام شد.');
  }catch(err){alert('بازیابی انجام نشد: '+(err.message||String(err)));}
  finally{$('backupFile').value='';}
 };
-$('kind').addEventListener('change',()=>{const daily=$('kind').value==='leave_daily';$('durationLabel').textContent=daily?'مدت (روز)':'مدت (ساعت)';$('duration').max=daily?'31':'24';$('duration').step=daily?'0.5':'0.25';$('duration').placeholder=daily?'مثلاً ۱':'مثلاً ۱٫۵';});
-
+$('recordDate').value=jalaliText(new Date());$('manualDate').value=jalaliText(new Date());
 $('requiredHours').onchange=()=>{settings.requiredHours=Number($('requiredHours').value)||8;localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
-$('annualLeaveDays').onchange=()=>{settings.annualLeaveDays=Math.max(0,Number($('annualLeaveDays').value)||0);localStorage.setItem(settingsKey,JSON.stringify(settings));render()};
 $('workplaceName').onchange=()=>{settings.workplaceName=$('workplaceName').value.trim();localStorage.setItem(settingsKey,JSON.stringify(settings));updateClock()};
 $('biometricEnabled').onchange=async()=>{const desired=$('biometricEnabled').checked;if(typeof window.saatzanConfigureBiometric!=='function'){alert('برای اثر انگشت، نسخه اندروید جدید را نصب کنید. این قابلیت در مرورگر قابل فعال‌سازی نیست.');$('biometricEnabled').checked=!!settings.biometricEnabled;return;}const ok=await window.saatzanConfigureBiometric(desired);if(ok){settings.biometricEnabled=desired;localStorage.setItem(settingsKey,JSON.stringify(settings));}else{$('biometricEnabled').checked=!!settings.biometricEnabled;}};
 window.deleteRecord=id=>{if(confirm('این مورد حذف شود؟')){records=records.filter(r=>r.id!==id);save();render()}};
@@ -366,40 +349,35 @@ $('exportCsv').onclick=async()=>{
  const daily=new Map();
  monthly.filter(isAttendance).forEach(r=>{
   const key=r.date;
-  if(!daily.has(key))daily.set(key,{date:key,ins:[],outs:[],minutes:0,workplaces:[]});
+  if(!daily.has(key))daily.set(key,{date:key,ins:[],outs:[],minutes:0});
   const d=daily.get(key);d.minutes+=duration(r);
   if(r.in)d.ins.push(r.in);if(r.out)d.outs.push(r.out);
-  const workplace=String(r.workplace||'').trim();if(workplace&&!d.workplaces.includes(workplace))d.workplaces.push(workplace);
  });
- const dateKeys=[...daily.keys()].sort();
- const detail=[['روز هفته','تاریخ شمسی','اولین ورود','آخرین خروج','محل کار','جمع کارکرد','ساعت موظفی','اضافه‌کاری','کم‌کاری','تعداد نوبت']];
+ const manualOTByDateForExport=new Map();
+ monthly.filter(r=>r.type==='overtime').forEach(r=>{if(!manualOTByDateForExport.has(r.date))manualOTByDateForExport.set(r.date,[]);manualOTByDateForExport.get(r.date).push(r);});
+ const dateKeys=[...new Set([...daily.keys(),...manualOTByDateForExport.keys()])].sort();
+ const detail=[['روز هفته','تاریخ شمسی','اولین ورود','آخرین خروج','جمع کارکرد','ساعت موظفی','اضافه‌کاری حضور و غیاب','اضافه‌کاری دستی','توضیحات اضافه‌کاری دستی','جمع اضافه‌کاری','کم‌کاری','تعداد نوبت']];
  let totalMinutes=0,totalOvertime=0,totalShort=0;
  const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
- const requiredMinutes=(Number(settings.requiredHours)||8)*60;
  const toTime=iso=>iso?new Date(iso).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'';
  dateKeys.forEach(date=>{
-  const d=daily.get(date),worked=d.minutes,regular=requiredMinutes,ot=Math.max(0,worked-regular),short=Math.max(0,regular-worked);
-  totalMinutes+=worked;totalOvertime+=ot;totalShort+=short;
+  const d=daily.get(date)||{date,ins:[],outs:[],minutes:0},worked=d.minutes,regular=480,ot=Math.max(0,worked-regular),manualItems=manualOTByDateForExport.get(date)||[],manualMinutes=manualItems.reduce((sum,r)=>sum+(Number(r.duration)||0)*60,0),allOT=ot+manualMinutes,short=Math.max(0,regular-worked);
+  totalMinutes+=worked;totalOvertime+=allOT;totalShort+=short;
   const ins=d.ins.sort(),outs=d.outs.sort();
-  detail.push([new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),jalaliText(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),toTime(ins[0]),toTime(outs[outs.length-1]),d.workplaces.join('، '),fmt(worked),fmt(regular),fmt(ot),fmt(short),d.ins.length]);
+  const manualNotes=manualItems.map(r=>r.notes||'').filter(Boolean).join(' | ');
+  detail.push([new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),jalaliText(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),toTime(ins[0]),toTime(outs[outs.length-1]),fmt(worked),fmt(regular),fmt(ot),fmt(manualMinutes),manualNotes,fmt(allOT),fmt(short),d.ins.length]);
  });
- detail.push(['جمع کل ماه','','','','',fmt(totalMinutes),fmt(dateKeys.length*requiredMinutes),fmt(totalOvertime),fmt(totalShort),dateKeys.length]);
+ detail.push(['جمع کل ماه','','','',fmt(totalMinutes),fmt(dateKeys.length*480),fmt(totalOvertime),fmt(totalShort),dateKeys.length]);
  const summary=[
   ['خلاصه کارکرد ماهانه',month],
   ['تعداد روزهای دارای ثبت',dateKeys.length],
   ['جمع کل کارکرد (ساعت:دقیقه)',fmt(totalMinutes)],
-  ['جمع ساعت موظفی ('+(Number(settings.requiredHours)||8)+' ساعت × روزهای دارای ثبت)',fmt(dateKeys.length*requiredMinutes)],
+  ['جمع ساعت موظفی (۸ ساعت × روزهای دارای ثبت)',fmt(dateKeys.length*480)],
   ['جمع کل اضافه‌کاری',fmt(totalOvertime)],
   ['جمع کل کم‌کاری',fmt(totalShort)],
-  ['مبنای محاسبه','کارکرد هر روز منهای '+(Number(settings.requiredHours)||8)+' ساعت؛ اضافه‌کاری فقط مقدار مثبت است']
+  ['مبنای محاسبه','اضافه‌کاری حضور و غیاب = مازاد کارکرد بر ۸ ساعت؛ اضافه‌کاری دستی جداگانه ثبت و به جمع اضافه‌کاری افزوده می‌شود']
  ];
- const leaveRecords=monthly.filter(r=>['leave','leave_daily'].includes(r.type)).sort((a,b)=>a.date.localeCompare(b.date));
- const leaveRows=[['تاریخ شمسی','نوع مرخصی','مدت','معادل ساعت','توضیحات']];
- leaveRecords.forEach(r=>{const day=new Date(+r.date.slice(0,4),+r.date.slice(5,7)-1,+r.date.slice(8,10),12);const daily=r.type==='leave_daily';leaveRows.push([jalaliText(day),daily?'مرخصی روزانه':'مرخصی ساعتی',`${r.duration||0} ${daily?'روز':'ساعت'}`,fmt((Number(r.duration)||0)*(daily?requiredMinutes:60)),r.notes||'']);});
- const annualDays=Number(settings.annualLeaveDays)||0, yearNow=Number(toLatinDigits(month).split('/')[0]);
- const annualUsed=records.filter(r=>['leave','leave_daily'].includes(r.type)&&Number(jalaliInputValue(r.date).slice(0,4))===yearNow).reduce((sum,r)=>sum+(r.type==='leave_daily'?(Number(r.duration)||0):(Number(r.duration)||0)/(Number(settings.requiredHours)||8)),0);
- summary.push(['سهمیه مرخصی استحقاقی سالانه (روز)',annualDays],['مصرف مرخصی استحقاقی در سال انتخابی (روز)',Number(annualUsed.toFixed(2))],['مانده مرخصی سالانه (روز)',Number((annualDays-annualUsed).toFixed(2))]);
- const exportData={filename:`saatzan-${month.replace('/','-')}.xlsx`,sheets:[{name:'کارکرد روزانه',rows:detail},{name:'خلاصه ماه',rows:summary},{name:'سوابق مرخصی',rows:leaveRows}]};
+ const exportData={filename:`saatzan-${month.replace('/','-')}.xlsx`,sheets:[{name:'کارکرد روزانه',rows:detail},{name:'خلاصه ماه',rows:summary}]};
  try{
   if(typeof window.saatzanExportXlsx==='function'){await window.saatzanExportXlsx(exportData);return;}
   const isNative=!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform());
@@ -417,13 +395,11 @@ document.querySelectorAll('.nav-btn').forEach(btn=>btn.onclick=()=>{
  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b===btn));
  document.querySelectorAll('.page-panel').forEach(panel=>panel.hidden=panel.id!==btn.dataset.page);
 });
-const manualPicker=createJalaliPicker('manualDate','manualDatePicker');
-const leavePicker=createJalaliPicker('recordDate','recordDatePicker');
-const reportPicker=createJalaliPicker('month','monthPicker',true);
+$('month').value=jalaliText(new Date()).slice(0,7);
 $('month').addEventListener('change',render);
 $('month').addEventListener('input',()=>{if(/^\d{4}[\/.-]\d{1,2}$/.test(toLatinDigits($('month').value.trim())))render();});
 $('refresh').onclick=render;
-render();updateClock();setInterval(updateClock,1000);
+$('recordDate').value=jalaliText(new Date());$('manualOTDate').value=jalaliText(new Date());render();updateClock();setInterval(updateClock,1000);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 <script src="biometric.bundle.js"></script>
