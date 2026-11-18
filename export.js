@@ -7,7 +7,7 @@ function buildWorkbook(data) {
   for (const sheet of data.sheets) {
     const ws = XLSX.utils.aoa_to_sheet(sheet.rows);
     ws['!cols'] = sheet.name === 'کارکرد روزانه'
-      ? [{wch:16},{wch:14},{wch:14},{wch:17},{wch:17},{wch:16},{wch:16},{wch:13}]
+      ? [{wch:16},{wch:14},{wch:14},{wch:17},{wch:17},{wch:16},{wch:20},{wch:16},{wch:36},{wch:18},{wch:14},{wch:13},{wch:32}]
       : [{wch:43},{wch:30}];
     const range = XLSX.utils.decode_range(ws['!ref'] || 'A1:A1');
     for (let R = range.s.r; R <= range.e.r; R++) {

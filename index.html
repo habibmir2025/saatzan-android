@@ -349,25 +349,27 @@ $('exportCsv').onclick=async()=>{
  const daily=new Map();
  monthly.filter(isAttendance).forEach(r=>{
   const key=r.date;
-  if(!daily.has(key))daily.set(key,{date:key,ins:[],outs:[],minutes:0});
+  if(!daily.has(key))daily.set(key,{date:key,ins:[],outs:[],minutes:0,workplaces:[]});
   const d=daily.get(key);d.minutes+=duration(r);
   if(r.in)d.ins.push(r.in);if(r.out)d.outs.push(r.out);
+  if(r.workplace&&String(r.workplace).trim())d.workplaces.push(String(r.workplace).trim());
  });
  const manualOTByDateForExport=new Map();
  monthly.filter(r=>r.type==='overtime').forEach(r=>{if(!manualOTByDateForExport.has(r.date))manualOTByDateForExport.set(r.date,[]);manualOTByDateForExport.get(r.date).push(r);});
  const dateKeys=[...new Set([...daily.keys(),...manualOTByDateForExport.keys()])].sort();
- const detail=[['روز هفته','تاریخ شمسی','اولین ورود','آخرین خروج','جمع کارکرد','ساعت موظفی','اضافه‌کاری حضور و غیاب','اضافه‌کاری دستی','توضیحات اضافه‌کاری دستی','جمع اضافه‌کاری','کم‌کاری','تعداد نوبت']];
+ const detail=[['روز هفته','تاریخ شمسی','اولین ورود','آخرین خروج','جمع کارکرد','ساعت موظفی','اضافه‌کاری حضور و غیاب','اضافه‌کاری دستی','توضیحات اضافه‌کاری دستی','جمع اضافه‌کاری','کم‌کاری','تعداد نوبت','توضیحات محل کار']];
  let totalMinutes=0,totalOvertime=0,totalShort=0;
  const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
  const toTime=iso=>iso?new Date(iso).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:false}):'';
  dateKeys.forEach(date=>{
-  const d=daily.get(date)||{date,ins:[],outs:[],minutes:0},worked=d.minutes,regular=480,ot=Math.max(0,worked-regular),manualItems=manualOTByDateForExport.get(date)||[],manualMinutes=manualItems.reduce((sum,r)=>sum+(Number(r.duration)||0)*60,0),allOT=ot+manualMinutes,short=Math.max(0,regular-worked);
+  const d=daily.get(date)||{date,ins:[],outs:[],minutes:0,workplaces:[]},worked=d.minutes,regular=480,ot=Math.max(0,worked-regular),manualItems=manualOTByDateForExport.get(date)||[],manualMinutes=manualItems.reduce((sum,r)=>sum+(Number(r.duration)||0)*60,0),allOT=ot+manualMinutes,short=Math.max(0,regular-worked);
   totalMinutes+=worked;totalOvertime+=allOT;totalShort+=short;
   const ins=d.ins.sort(),outs=d.outs.sort();
   const manualNotes=manualItems.map(r=>r.notes||'').filter(Boolean).join(' | ');
-  detail.push([new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),jalaliText(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),toTime(ins[0]),toTime(outs[outs.length-1]),fmt(worked),fmt(regular),fmt(ot),fmt(manualMinutes),manualNotes,fmt(allOT),fmt(short),d.ins.length]);
+  const workplaceNotes=[...new Set(d.workplaces)].join('، ');
+  detail.push([new Intl.DateTimeFormat('fa-IR',{weekday:'long'}).format(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),jalaliText(new Date(+date.slice(0,4),+date.slice(5,7)-1,+date.slice(8,10),12)),toTime(ins[0]),toTime(outs[outs.length-1]),fmt(worked),fmt(regular),fmt(ot),fmt(manualMinutes),manualNotes,fmt(allOT),fmt(short),d.ins.length,workplaceNotes]);
  });
- detail.push(['جمع کل ماه','','','',fmt(totalMinutes),fmt(dateKeys.length*480),fmt(totalOvertime),fmt(totalShort),dateKeys.length]);
+ detail.push(['جمع کل ماه','','','','',fmt(totalMinutes),fmt(dateKeys.length*480),fmt(totalOvertime),'',fmt(totalOvertime),fmt(totalShort),dateKeys.length,'']);
  const summary=[
   ['خلاصه کارکرد ماهانه',month],
   ['تعداد روزهای دارای ثبت',dateKeys.length],
